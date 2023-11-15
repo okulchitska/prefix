@@ -1,0 +1,4 @@
+﻿Browser("Amazon.com. Spend less.").Page("Amazon.com. Spend less.").WebEdit("Search").Set "tablet" @@ hightlight id_;_Browser("Amazon.com. Spend less.").Page("Amazon.com. Spend less.").WebEdit("Search")_;_script infofile_;_ZIP::ssf1.xml_;_
+Browser("Amazon.com. Spend less.").Page("Amazon.com. Spend less.").WebButton("Go").Click @@ hightlight id_;_Browser("Amazon.com. Spend less.").Page("Amazon.com. Spend less.").WebButton("Go")_;_script infofile_;_ZIP::ssf2.xml_;_
+Browser("Amazon.com. Spend less.").Page("Amazon.com : tablet").WebCheckBox("WebCheckBox").Set "ON" @@ hightlight id_;_Browser("Amazon.com. Spend less.").Page("Amazon.com : tablet").WebCheckBox("WebCheckBox")_;_script infofile_;_ZIP::ssf3.xml_;_
+Browser("Amazon.com. Spend less.").Page("Amazon.com : tablet").Image("Tablet 10.1 Inch Android").Click @@ hightlight id_;_Browser("Amazon.com. Spend less.").Page("Amazon.com : tablet").Image("Tablet 10.1 Inch Android")_;_script infofile_;_ZIP::ssf4.xml_;_
