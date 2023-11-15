@@ -1,0 +1,6 @@
+<Environment>
+  <Variable>
+    <Name>MyGlobalVariable</Name>
+      <Value>ALM</Value>
+  </Variable>
+</Environment> 

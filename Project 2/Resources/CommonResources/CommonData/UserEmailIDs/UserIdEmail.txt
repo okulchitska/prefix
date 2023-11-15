@@ -1,0 +1,13 @@
+snayak:sanjeeth.nayak@amadeus.com;
+RAVKUMAR:ravi.kumar@amadeus.com;
+rnayak:Nayak.RATNAKARAJANTH@amadeus.com;
+RBOKKA:Rupawathi.BOKKA@amadeus.com;
+Akeshavrao:Ashwini.KESHAVRAO@amadeus.com;
+KVERMA2:Kirti.VERMA2@amadeus.com;
+srani:sindhu.rani@amadeus.com;
+imohammed:imrana.mohammed@amadeus.com;
+ddesai:Devanshi.DESAI@amadeus.com;
+vkulkarni:vilas.kulkarni@amadeus.com;
+app-alm-dcs:sanjeeth.nayak@amadeus.com;
+adevaraj:anjaly.devaraj@amadeus.com;
+wshaikh:waseem.shaikh@amadeus.com;

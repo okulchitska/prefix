@@ -1,0 +1,2166 @@
+﻿
+'Function : f_FlightInformation()
+'Description:Navigate to FLight information and Checks for acceptance figure
+
+Function f_FlightCheckinInfo()
+   'JavaWindow("wndCM").JavaButton("btnFlightInfo").Click
+	wait 2
+	a_GetCurrentScreenName=split(replace(replace(replace(JavaWindow("wndCM").JavaObject("objBreadCrumbTrail").Object.toString, ",,","~|~"),",","~|~"),":","~|~"),"~|~")
+	CMGetCMScreen =  a_GetCurrentScreenName(ubound(a_GetCurrentScreenName))
+	
+	If CMGetCMScreen = "Flight Information" Then
+		loopin = 0
+		Do
+			If JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Exist Then
+				loopin = 4
+				JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Click
+			End If
+			wait 2
+			If JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Exist Then
+				loopin = 5
+				JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Click
+			End If
+			loopin = loopin +1 
+		Loop While loopin = 5
+	End If
+End Function
+
+'Function:f_CheckFlightFigure()
+'Description: Checks weather the flight figures
+
+
+Function f_CheckFlightFigureLeg1(Passengerbooked,Leg1Bookingcount,Leg1Acceptancecount,P2PAcceptancecount,P2PBookingcount)
+	getaccprowsC_csaA =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("rows")
+	getaccpcolsC_csaA =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("cols")
+	
+	Leg1andp2p=Cint (Leg1Acceptancecount)+Cint(P2PAcceptancecount)
+	Environment.Value("RSEnabled") = 0
+	For Ro1C_csa = 0 To getaccprowsC_csaA-1
+		For Co1C_csa = 2 To getaccpcolsC_csaA -1
+			
+			If Ro1C_csa = 0 and Co1C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(Leg1Bookingcount)
+			ElseIf Ro1C_csa = 1 and Co1C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(P2PBookingcount)
+			ElseIf Ro1C_csa = 2 and Co1C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(0,4))+Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(1,4)))
+			ElseIf Ro1C_csa = 0 and Co1C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(Leg1Acceptancecount)
+			ElseIf Ro1C_csa = 1 and Co1C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(P2PAcceptancecount)
+			ElseIf Ro1C_csa = 2 and Co1C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa)), "=", Cstr(Leg1andp2p)
+'			ElseIf JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro1C_csa,Co1C_csa) <> 0 Then
+'				Reporter+.ReportEvent micFail,"Check Flt Figures","Flight figures not zero"
+'				ExitTest
+			End If
+		Next
+	Next
+	
+	
+End Function
+
+Function f_CheckFlightFigureLeg2(Passengerbooked,P2PBookingcount,Leg1Acceptancecount,Leg2Acceptancecount,P2PAcceptancecount,Leg2Bookingcount)
+	getaccprowsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("rows") ' case A leg B
+	getaccpcolsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("cols")
+	'totalacceptedLeg3acc=Cint (Leg1Acceptancecount)+Cint(Leg2Acceptancecount)
+	For Ro2C_csa = 0 To getaccprowsC_csaB-1 ' Ro of leg>2< Tc >A< of csa 
+		For Co2C_csa = 2 To getaccpcolsC_csaB -1
+			If Ro2C_csa = 0 and Co2C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=",  Cstr(P2PBookingcount)
+			
+			ElseIf Ro2C_csa = 0 and Co2C_csa = 10 Then	
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(P2PAcceptancecount)	
+			ElseIf Ro2C_csa = 1 and Co2C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(P2PBookingcount)
+			ElseIf Ro2C_csa = 1 and Co2C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(P2PAcceptancecount)	
+			ElseIf Ro2C_csa = 2 and Co2C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Leg2Bookingcount)
+			ElseIf Ro2C_csa = 3 and Co2C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Leg2Bookingcount)
+			ElseIf Ro2C_csa = 4 and Co2C_csa = 4 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(1,4))+Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(3,4)))
+			ElseIf Ro2C_csa = 2 and Co2C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Leg2Acceptancecount)
+			
+			ElseIf Ro2C_csa = 3 and Co2C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Leg2Acceptancecount)
+
+			ElseIf Ro2C_csa = 4 and Co2C_csa = 10 Then
+				Common_SimpleCompare Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa)), "=", Cstr(Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(1,10))+Cint(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(3,10)))
+				
+'			ElseIf JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa) <> 0 Then
+'				Reporter.ReportEvent micFail,"Check Flt Figures","Flight figures not zero"
+''				'ExitTest
+			End If
+		Next
+	Next
+		
+End Function
+
+
+Function  f_FlightWeightandBalanceLeg1(testdate,Leg1Acceptancecount,P2PAcceptancecount,Leg1Baggage,Leg1Weight,P2PBaggage,P2PWeight)
+	JavaWindow("wndCM").JavaCheckBox("chkFlight").Set "ON"
+	JavaWindow("wndCM").JavaMenu("mnuCustomerWeightandBalanceDetails").Select
+	
+	Leg1andp2p=Cint(Leg1Acceptancecount)+Cint(P2PAcceptancecount)
+	
+	Leg1p2pBaggage=Cint(Leg1Baggage)+Cint(P2PBaggage)
+	Leg1p2pWeight=Cint(Leg1Weight)+Cint(P2PWeight)
+	
+	Common_SimpleCompare trim(Common_CMReadTE("3|1|5")), "=", environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare Common_CMReadTE("3|10|4"), "=", Cstr(UCase(testdate))
+	Common_SimpleCompare Common_CMReadTE("3|17|2"), "=", environment.Value("e_DepaturePort")
+	Common_SimpleCompare Common_CMReadTE("4|18|23"), "=", "ACCEPTANCE NOT FINALISED"
+'	Common_SimpleCompare Common_CMReadTE("6|1|2"), "=", environment.Value("e_ArrivalPort")
+	Common_SimpleCompare Common_CMReadTE("7|2|6"), "=", "Joining"
+'	Common_SimpleCompare Common_CMReadTE("15|1|2"), "=", environment.Value("e_ArrivalPortL2")
+	Common_SimpleCompare Common_CMReadTE("16|2|6"), "=", "Transit"
+	
+'	JavaWindow("wndCM").JavaButton("btnPrinttoDefault").Click
+'	
+'	Overalltext=JavaWindow("wndPRT0").JavaEdit("txtTextOutput").GetROProperty("value")
+'	JavaWindow("wndPRT0").Close
+	Overalltext=Common_CMReadTE("All")
+	
+	set txtLeg1Acceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1Baggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1Weight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s][\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtTotLeg1Acceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg1Baggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg1Weight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+'	
+	set txtP2PAcceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", True)
+	set txtP2PBaggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", True)
+	set txtP2PWeight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s][\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", True)
+	
+	set txtTotP2PAcceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotP2PBaggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotP2PWeight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtLeg1andp2p =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1p2pBaggage =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtLeg1p2pWeight =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*@*(\d\d\d|\d\d|\d)", False)
+	
+	Set txtLeg1Rushbag=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg1Rushbagweight=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	Set txtLeg1Crewbag=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg1crewbagweight=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	
+	
+	Common_SimpleCompare txtLeg1Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg1Acceptancecount)
+	Common_SimpleCompare txtLeg1Baggage.item(0).Submatches(0) ,"=", Cstr(Leg1Baggage)
+	Common_SimpleCompare txtLeg1Weight.item(0).Submatches(0) ,"=", Cstr(Leg1Weight)
+	
+'	Common_SimpleCompare txtTotLeg1Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg1Acceptancecount)
+'	Common_SimpleCompare txtTotLeg1Baggage.item(0).Submatches(0) ,"=", Cstr(Leg1Baggage)
+'	Common_SimpleCompare txtTotLeg1Weight.item(0).Submatches(0) ,"=", Cstr(Leg1Weight)
+	
+'	Common_SimpleCompare txtP2PAcceptancecount.item(2).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+'	Common_SimpleCompare txtP2PBaggage.item(1).Submatches(0) ,"=", Cstr(P2PBaggage)
+'	Common_SimpleCompare txtP2PWeight.item(1).Submatches(0) ,"=", Cstr(P2PWeight)
+'	
+	OverallP2PBaggage=Cint(P2PBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)+txtLeg1Rushbag.item(1).Submatches(0)+txtLeg1Rushbag.item(0).Submatches(0)+txtLeg1Crewbag.item(1).Submatches(0)+txtLeg1Crewbag.item(0).Submatches(0)
+	OverallP2PWeight=Cint(P2PWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)+txtLeg1Rushbagweight.item(1).Submatches(0)+txtLeg1Rushbagweight.item(0).Submatches(0)+txtLeg1crewbagweight.item(1).Submatches(0)+txtLeg1crewbagweight.item(0).Submatches(0)
+	
+	OverallTotP2PBaggage=Cint(Leg1p2pBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)
+	OverallTotP2PWeight=Cint(Leg1p2pWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)
+	
+	
+	
+	Common_SimpleCompare txtTotP2PAcceptancecount.item(0).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+	Common_SimpleCompare txtTotP2PBaggage.item(0).Submatches(0) ,"=", Cstr(OverallP2PBaggage)
+	Common_SimpleCompare txtTotP2PWeight.item(0).Submatches(0) ,"=", Cstr(OverallP2PWeight)
+	
+	
+'	Common_SimpleCompare txtLeg1andp2p.item(0).Submatches(0) ,"=", Cstr(Leg1andp2p)
+'	Common_SimpleCompare txtLeg1p2pBaggage.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PBaggage)
+'	Common_SimpleCompare txtLeg1p2pWeight.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PWeight)
+'
+	JavaWindow("wndCM").JavaButton("btnExit").Click
+
+End Function
+
+Function f_FlightWeightandBalanceLeg2(testdate,Leg2Acceptancecount,P2PAcceptancecount,Leg2Baggage,Leg2Weight,P2PBaggage,P2PWeight)
+	JavaWindow("wndCM").JavaCheckBox("chkFlight").Set "ON"
+	JavaWindow("wndCM").JavaMenu("mnuCustomerWeightandBalanceDetails").Select
+	
+	Leg2andP2P=Cint(P2PAcceptancecount)+Cint(Leg2Acceptancecount)
+	Leg2p2pBaggage=Cint(Leg2Baggage)+Cint(P2PBaggage)
+	Leg2p2pWeight=Cint(Leg2Weight)+Cint(P2PWeight)
+	
+	Common_SimpleCompare trim(Common_CMReadTE("3|1|5")), "=", environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare Common_CMReadTE("3|10|4"), "=", Cstr(UCase(testdate))
+	Common_SimpleCompare Common_CMReadTE("3|17|2"), "=", environment.Value("e_ArrivalPort")
+	Common_SimpleCompare Common_CMReadTE("4|18|23"), "=", "ACCEPTANCE NOT FINALISED"
+	Common_SimpleCompare Common_CMReadTE("6|1|2"), "=", environment.Value("e_ArrivalPortL2")
+	Common_SimpleCompare Common_CMReadTE("7|2|6"), "=", "Transit"
+	Common_SimpleCompare Common_CMReadTE("12|2|6"), "=", "Joining"
+	
+'	JavaWindow("wndCM").JavaButton("btnPrinttoDefault").Click
+'	wait 5
+'	Overalltext=JavaWindow("wndPRT0").JavaEdit("txtTextOutput").GetROProperty("value")
+'	wait 3
+'	JavaWindow("wndPRT0").Close
+
+	Overalltext=Common_CMReadTE("All")
+	set txtP2PAcceptancecount =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtP2PBaggage =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtP2PWeight =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+
+	set txtLeg2Acceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2Baggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2Weight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtTotLeg2Acceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg2Baggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtTotLeg2Weight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtLeg2andp2p =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2p2pBaggage =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtLeg2p2pWeight =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*@*(\d\d\d|\d\d|\d)", False)
+	
+	Set txtLeg2Rushbag=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg2Rushbagweight=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	Set txtLeg2Crewbag=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg2crewbagweight=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	
+	
+	
+'	Common_SimpleCompare txtP2PAcceptancecount.item(0).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+'	Common_SimpleCompare txtP2PBaggage.item(0).Submatches(0) ,"=", Cstr(P2PBaggage)
+'	Common_SimpleCompare txtP2PWeight.item(0).Submatches(0) ,"=", Cstr(P2PWeight)
+'	
+	Common_SimpleCompare txtLeg2Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg2Acceptancecount)
+	Common_SimpleCompare txtLeg2Baggage.item(0).Submatches(0) ,"=", Cstr(Leg2Baggage)
+	Common_SimpleCompare txtLeg2Weight.item(0).Submatches(0) ,"=", Cstr(Leg2Weight)
+	
+'	OverallP2PBaggage=Cint(P2PBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)
+'	OverallP2PWeight=Cint(P2PWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)
+	
+	OverallTotP2PBaggage=Cint(Leg2p2pBaggage)+txtLeg2Rushbag.item(0).Submatches(0)+txtLeg2Crewbag.item(0).Submatches(0)+txtLeg2Rushbag.item(1).Submatches(0)+txtLeg2Crewbag.item(1).Submatches(0)
+	OverallTotP2PWeight=Cint(Leg2p2pWeight)+txtLeg2Rushbagweight.item(0).Submatches(0)+txtLeg2crewbagweight.item(0).Submatches(0)+txtLeg2Rushbagweight.item(1).Submatches(0)+txtLeg2crewbagweight.item(1).Submatches(0)
+	
+	
+	Common_SimpleCompare txtLeg2andp2p.item(0).Submatches(0) ,"=", Cstr(Leg2andP2P)
+	Common_SimpleCompare txtLeg2p2pBaggage.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PBaggage)
+	Common_SimpleCompare txtLeg2p2pWeight.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PWeight)
+	
+	JavaWindow("wndCM").JavaButton("btnExit").Click
+
+
+End  Function
+
+
+
+
+Function  f_FlightWeightandBalanceInfantLeg1(testdate,Leg1Acceptancecount,P2PAcceptancecount,Leg1Baggage,Leg1Weight,P2PBaggage,P2PWeight,P2PInfantcount)
+	JavaWindow("wndCM").JavaCheckBox("chkFlight").Set "ON"
+	JavaWindow("wndCM").JavaMenu("mnuCustomerWeightandBalanceDetails").Select
+	
+	Leg1andp2p=Cint(Leg1Acceptancecount)+Cint(P2PAcceptancecount)
+	
+	Leg1p2pBaggage=Cint(Leg1Baggage)+Cint(P2PBaggage)
+	Leg1p2pWeight=Cint(Leg1Weight)+Cint(P2PWeight)
+	
+	Common_SimpleCompare Common_CMReadTE("3|1|5"), "=", environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare Common_CMReadTE("3|10|4"), "=", Cstr(UCase(testdate))
+	Common_SimpleCompare Common_CMReadTE("3|17|2"), "=", environment.Value("e_DepaturePort")
+	Common_SimpleCompare Common_CMReadTE("4|18|23"), "=", "ACCEPTANCE NOT FINALISED"
+	Common_SimpleCompare Common_CMReadTE("6|1|2"), "=", environment.Value("e_ArrivalPort")
+	Common_SimpleCompare Common_CMReadTE("7|2|6"), "=", "Joining"
+	Common_SimpleCompare Common_CMReadTE("15|1|2"), "=", environment.Value("e_ArrivalPortL2")
+	Common_SimpleCompare Common_CMReadTE("16|2|6"), "=", "Transit"
+	
+	Overalltext=Common_CMReadTE("All")
+	set txtLeg1Acceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1Baggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1Weight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s][\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtTotLeg1Acceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg1Baggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg1Weight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPort")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtP2PAcceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", True)
+	set txtP2PBaggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", True)
+	set txtP2PWeight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s][\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", True)
+	
+	set txtTotP2PAcceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotP2PBaggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotP2PWeight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtLeg1andp2p =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg1p2pBaggage =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtLeg1p2pWeight =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*@*(\d\d\d|\d\d|\d)", False)
+	
+	Set txtLeg1Rushbag=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg1Rushbagweight=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	Set txtLeg1Crewbag=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg1crewbagweight=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	
+	Set txtInfantCount=Common_RegExecution(Overalltext,"INFANTS?[\s]*(\d\d|\d)", False)
+	
+	Common_SimpleCompare txtLeg1Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg1Acceptancecount)
+	Common_SimpleCompare txtLeg1Baggage.item(0).Submatches(0) ,"=", Cstr(Leg1Baggage)
+	Common_SimpleCompare txtLeg1Weight.item(0).Submatches(0) ,"=", Cstr(Leg1Weight)
+	
+	Common_SimpleCompare txtTotLeg1Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg1Acceptancecount)
+	Common_SimpleCompare txtTotLeg1Baggage.item(0).Submatches(0) ,"=", Cstr(Leg1Baggage)
+	Common_SimpleCompare txtTotLeg1Weight.item(0).Submatches(0) ,"=", Cstr(Leg1Weight)
+	
+	Common_SimpleCompare txtP2PAcceptancecount.item(1).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+	Common_SimpleCompare txtP2PBaggage.item(1).Submatches(0) ,"=", Cstr(P2PBaggage)
+	Common_SimpleCompare txtP2PWeight.item(1).Submatches(0) ,"=", Cstr(P2PWeight)
+	
+	OverallP2PBaggage=Cint(P2PBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)+txtLeg1Rushbag.item(1).Submatches(0)+txtLeg1Rushbag.item(0).Submatches(0)+txtLeg1Crewbag.item(1).Submatches(0)+txtLeg1Crewbag.item(0).Submatches(0)
+	OverallP2PWeight=Cint(P2PWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)+txtLeg1Rushbagweight.item(1).Submatches(0)+txtLeg1Rushbagweight.item(0).Submatches(0)+txtLeg1crewbagweight.item(1).Submatches(0)+txtLeg1crewbagweight.item(0).Submatches(0)
+	
+	OverallTotP2PBaggage=Cint(Leg1p2pBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)
+	OverallTotP2PWeight=Cint(Leg1p2pWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)
+	
+	
+	
+	Common_SimpleCompare txtTotP2PAcceptancecount.item(0).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+	Common_SimpleCompare txtTotP2PBaggage.item(0).Submatches(0) ,"=", Cstr(OverallP2PBaggage)
+	Common_SimpleCompare txtTotP2PWeight.item(0).Submatches(0) ,"=", Cstr(OverallP2PWeight)
+	
+	
+	Common_SimpleCompare txtLeg1andp2p.item(0).Submatches(0) ,"=", Cstr(Leg1andp2p)
+	Common_SimpleCompare txtLeg1p2pBaggage.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PBaggage)
+	Common_SimpleCompare txtLeg1p2pWeight.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PWeight)
+	
+	Common_SimpleCompare txtInfantCount.item(0).Submatches(0) ,"=", Cstr(P2PInfantcount)
+	
+
+	JavaWindow("wndCM").JavaButton("btnExit").Click
+
+End Function
+
+Function f_FlightWeightandBalanceInfantLeg2(testdate,Leg2Acceptancecount,P2PAcceptancecount,Leg2Baggage,Leg2Weight,P2PBaggage,P2PWeight,P2PInfantcount)
+	JavaWindow("wndCM").JavaCheckBox("chkFlight").Set "ON"
+	JavaWindow("wndCM").JavaMenu("mnuCustomerWeightandBalanceDetails").Select
+	
+	Leg2andP2P=Cint(P2PAcceptancecount)+Cint(Leg2Acceptancecount)
+	Leg2p2pBaggage=Cint(Leg2Baggage)+Cint(P2PBaggage)
+	Leg2p2pWeight=Cint(Leg2Weight)+Cint(P2PWeight)
+	
+	Common_SimpleCompare Common_CMReadTE("3|1|5"), "=", environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare Common_CMReadTE("3|10|4"), "=", Cstr(UCase(testdate))
+	Common_SimpleCompare Common_CMReadTE("3|17|2"), "=", environment.Value("e_ArrivalPort")
+	Common_SimpleCompare Common_CMReadTE("4|18|23"), "=", "ACCEPTANCE NOT FINALISED"
+	Common_SimpleCompare Common_CMReadTE("6|1|2"), "=", environment.Value("e_ArrivalPortL2")
+	Common_SimpleCompare Common_CMReadTE("7|2|6"), "=", "Transit"
+	Common_SimpleCompare Common_CMReadTE("12|2|6"), "=", "Joining"
+	
+	Overalltext=Common_CMReadTE("All")
+	set txtP2PAcceptancecount =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtP2PBaggage =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtP2PWeight =  Common_RegExecution(Overalltext,"Transit[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+
+	set txtLeg2Acceptancecount =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2Baggage =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2Weight =  Common_RegExecution(Overalltext,"Joi[\s\S]*?Y[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtTotLeg2Acceptancecount =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtTotLeg2Baggage =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtTotLeg2Weight =  Common_RegExecution(Overalltext,"TOTAL\("&environment.Value("e_ArrivalPortL2")&"\)?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s\S]*?@(\d\d\d|\d\d|\d)", False)
+	
+	set txtLeg2andp2p =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*(\d\d|\d)", False)
+	set txtLeg2p2pBaggage =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*(\d\d\d|\d\d|\d)", False)
+	set txtLeg2p2pWeight =  Common_RegExecution(Overalltext,"GRAND TOTAL?[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*[\s]*[\d\d|\d]*@*(\d\d\d|\d\d|\d)", False)
+	
+	Set txtLeg2Rushbag=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg2Rushbagweight=  Common_RegExecution(Overalltext,"RUSH BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	Set txtLeg2Crewbag=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s](\d\d|\d)", True)
+	Set txtLeg2crewbagweight=  Common_RegExecution(Overalltext,"CREW BAGS*[\s][\s]?[\s]-[\s][\s][\s][\s][\s][\d\d|\d]@(\d\d|\d)", True)
+	
+	
+	Set txtInfantCount=Common_RegExecution(Overalltext,"INFANTS?[\s]*(\d\d|\d)", False)
+	
+	
+	Common_SimpleCompare txtP2PAcceptancecount.item(0).Submatches(0) ,"=", Cstr(P2PAcceptancecount)
+	Common_SimpleCompare txtP2PBaggage.item(0).Submatches(0) ,"=", Cstr(P2PBaggage)
+	Common_SimpleCompare txtP2PWeight.item(0).Submatches(0) ,"=", Cstr(P2PWeight)
+	
+	Common_SimpleCompare txtLeg2Acceptancecount.item(0).Submatches(0) ,"=", Cstr(Leg2Acceptancecount)
+	Common_SimpleCompare txtLeg2Baggage.item(0).Submatches(0) ,"=", Cstr(Leg2Baggage)
+	Common_SimpleCompare txtLeg2Weight.item(0).Submatches(0) ,"=", Cstr(Leg2Weight)
+	
+'	OverallP2PBaggage=Cint(P2PBaggage)+txtLeg1Rushbag.item(2).Submatches(0)+txtLeg1Crewbag.item(2).Submatches(0)
+'	OverallP2PWeight=Cint(P2PWeight)+txtLeg1Rushbagweight.item(2).Submatches(0)+txtLeg1crewbagweight.item(2).Submatches(0)
+	
+	OverallTotP2PBaggage=Cint(Leg2p2pBaggage)+txtLeg2Rushbag.item(0).Submatches(0)+txtLeg2Crewbag.item(0).Submatches(0)+txtLeg2Rushbag.item(1).Submatches(0)+txtLeg2Crewbag.item(1).Submatches(0)
+	OverallTotP2PWeight=Cint(Leg2p2pWeight)+txtLeg2Rushbagweight.item(0).Submatches(0)+txtLeg2crewbagweight.item(0).Submatches(0)+txtLeg2Rushbagweight.item(1).Submatches(0)+txtLeg2crewbagweight.item(1).Submatches(0)
+	
+	
+	Common_SimpleCompare txtLeg2andp2p.item(0).Submatches(0) ,"=", Cstr(Leg2andP2P)
+	Common_SimpleCompare txtLeg2p2pBaggage.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PBaggage)
+	Common_SimpleCompare txtLeg2p2pWeight.item(0).Submatches(0) ,"=", Cstr(OverallTotP2PWeight)
+	
+	Common_SimpleCompare txtInfantCount.item(0).Submatches(0) ,"=", Cstr(P2PInfantcount)
+	
+	
+	JavaWindow("wndCM").JavaButton("btnExit").Click
+
+
+End  Function
+
+Function GetBookingcount(Leg1Bookingcount,Leg2Bookingcount,P2PBookingcount)
+
+environment.Value("e_From") = environment.Value("e_DepaturePort")
+CM_SearchFlight()
+JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Click
+getaccprowsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("rows") ' case A leg B
+	getaccpcolsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("cols")
+	'totalacceptedLeg3acc=Cint (Leg1Acceptancecount)+Cint(Leg2Acceptancecount)
+	For Ro2C_csa = 0 To getaccprowsC_csaB-1 ' Ro of leg>2< Tc >A< of csa 
+		For Co2C_csa = 2 To getaccpcolsC_csaB -1
+			If Ro2C_csa = 0 and Co2C_csa = 4 Then
+				 Leg1Bookingcount=Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa))
+			
+			ElseIf Ro2C_csa = 1 and Co2C_csa = 4 Then	
+				P2PBookingcount=Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa))	
+			
+			End If
+		Next
+	Next
+	CM_CloseAllTabs()
+	environment.Value("e_From") = environment.Value("e_ArrivalPort")
+	CM_SearchFlight()
+	JavaWindow("wndCM").JavaButton("btnAcceptanceFigures").Click
+	
+	getaccprowsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("rows") ' case A leg B
+	getaccpcolsC_csaB =  JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetROProperty("cols")
+	
+	For Ro2C_csa = 0 To getaccprowsC_csaB-1 ' Ro of leg>2< Tc >A< of csa 
+		For Co2C_csa = 2 To getaccpcolsC_csaB -1
+			If Ro2C_csa = 2 and Co2C_csa = 4 Then
+				Leg2Bookingcount= Cstr(JavaWindow("wndCM").JavaTable("tblAcceptanceFigures").GetCellData(Ro2C_csa,Co2C_csa))
+			
+			
+			End If
+		Next
+	Next
+environment.Value("e_From") = environment.Value("e_DepaturePort")
+
+End Function
+
+Function f_GetBookingInfantCountP2P(P2PBookingInfantcount)
+P2PBookingInfantcount=Cint(P2PBookingInfantcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Infant (INF)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		P2PBookingInfantcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+
+
+Function f_GetRebatestaffcountLeg1(Leg1Rebatestafcount)
+Leg1Rebatestafcount=Cint(Leg1Rebatestafcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Staff Customers (STF);Value|Staff Customers - All"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Leg1Rebatestafcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+
+Function f_GetRebatestaffcountLeg2(Leg2Rebatestafcount)
+Leg2Rebatestafcount=Cint(Leg2Rebatestafcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Staff Customers (STF);Value|Staff Customers - All"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Leg2Rebatestafcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+
+
+
+
+Function f_GetAcceptanceCountLeg1(Leg1Acceptancecount)
+Leg1Acceptancecount=Cint(Leg1Acceptancecount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 10
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Acceptance Status (CAS);Value|Accepted (AC)"
+	wait 2
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Leg1Acceptancecount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+Function f_GetAcceptanceCountP2P(P2PAcceptancecount)
+JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Acceptance Status (CAS);Value|Accepted (AC)"
+	wait 2
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		P2PAcceptancecount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")	
+	End If
+	
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End  Function
+
+Function f_GetAcceptanceCountLeg2(Leg2Acceptancecount)
+
+JavaWindow("wndCM").JavaMenu("mnuApplications").highlight
+wait 2
+	JavaWindow("wndCM").JavaMenu("mnuApplications").JavaMenu("mnuFlight").Select
+	Common_CMScreenCheck "Enter Flight|10"
+	JavaWindow("wndCM").JavaEdit("txtAirlineCode").Set environment.Value("e_AirlineCode")
+	JavaWindow("wndCM").JavaEdit("txtFlightNumber").Set environment.Value("e_FlightNo")
+	JavaWindow("wndCM").JavaEdit("txtDate").Set environment.Value("e_FlightDate")
+	JavaWindow("wndCM").JavaEdit("txtAirportFrom").Set environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select  environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Acceptance Status (CAS);Value|Accepted (AC)"
+	wait 2
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Leg2Acceptancecount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")	
+	End If
+	
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End  Function
+
+
+Function f_GetInfantCountP2P(P2PInfantcount)
+P2PInfantcount=Cint(P2PInfantcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Acceptance Status (CAS);Value|Accepted (AC)"
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Filter|Infant (INF)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		P2PInfantcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+Function f_GetBokookingCountP2P(P2PBookingcount)
+P2PBookingcount=Cint(P2PBookingcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Staff Customers (STF);Value|Staff Customers - All"
+
+	wait 2
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+	
+	
+	'Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Infant (INF)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		P2PBookingcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+Function f_GetBokookingCountLeg1(FMLeg1Bookingcount)
+FMLeg1Bookingcount=Cint(FMLeg1Bookingcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Staff Customers (STF);Value|Staff Customers - All"
+
+	wait 3
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		FMLeg1Bookingcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+Function f_GetBokookingCountP2P(FMP2PBookingcount)
+FMP2PBookingcount=Cint(FMP2PBookingcount)
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Staff Customers (STF);Value|Staff Customers - All"
+
+	wait 3
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		Common_CMScreenCheck "Customer List"
+	
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		FMP2PBookingcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	 	
+	
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End Function
+
+
+
+Function f_GetBokookingCountLeg2(FMLeg2Bookingcount)
+
+JavaWindow("wndCM").JavaMenu("mnuApplications").highlight
+wait 2
+	JavaWindow("wndCM").JavaMenu("mnuApplications").JavaMenu("mnuFlight").Select
+	Common_CMScreenCheck "Enter Flight|10"
+	JavaWindow("wndCM").JavaEdit("txtAirlineCode").Set environment.Value("e_AirlineCode")
+	JavaWindow("wndCM").JavaEdit("txtFlightNumber").Set environment.Value("e_FlightNo")
+	JavaWindow("wndCM").JavaEdit("txtDate").Set environment.Value("e_FlightDate")
+	JavaWindow("wndCM").JavaEdit("txtAirportFrom").Set environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select  environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCabin").Select "Y"
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Staff Customers (STF);Value|Staff Customers - All"
+
+	wait 3
+	
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Include/Exclude|Exclude;Filter|Infant (INF)"
+
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	
+		If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		FMLeg2Bookingcount=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")	
+	End If
+	
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+	
+End  Function
+
+
+
+Function f_getWeightAndBaggageCountLeg1(Leg1Baggage,Leg1Weight)
+	Leg1Baggage=0
+	Leg1Weight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Common_CMScreenCheck "Customer List"
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(10)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			Leg1Baggage=Leg1Baggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			Leg1Weight=Leg1Weight+ IndividualWeight	
+		Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+
+
+Function f_getWeightAndBaggageCountP2P(P2PBaggage,P2PWeight)
+	P2PBaggage=0
+	P2PWeight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(10)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			P2PBaggage=P2PBaggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			P2PWeight=P2PWeight+ IndividualWeight		
+		Next
+	End if 
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+Function f_getWeightAndBaggageCountLeg2(Leg2Baggage,Leg2Weight)
+	Leg2Baggage=0
+	Leg2Weight=0
+	CM_CloseAllTabs
+	environment.Value("e_From") = environment.Value("e_ArrivalPort")
+	''RunAction "CM_SearchFlight [CM_SearchFlight]", oneIteration
+	CM_SearchFlight
+	
+   	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+	Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	For i = 0 To Cint(Baggageacc)-1 Step 1
+		Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(10)|cthFltnum"
+		Baggagedetails=environment.value("cthFltnum")
+		splitbaggagedetails= split(Baggagedetails," ")
+		Baggage=Split(splitbaggagedetails(2),"=")
+		Baggagenum=Split(splitbaggagedetails(1),"=")
+		IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+		Leg2Baggage=Leg2Baggage+IndividualBagnum
+		IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+		Leg2Weight=Leg2Weight+ IndividualWeight		
+	Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+Function f_getWeightAndBaggageCountLeg1withoutOncarriage(WOLeg1Baggage,WOLeg1Weight)
+	WOLeg1Baggage=0
+	WOLeg1Weight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Oncarriage Baggage (ONB)"
+	wait 3
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	
+	
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Common_CMScreenCheck "Customer List"
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			WOLeg1Baggage=WOLeg1Baggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			WOLeg1Weight=WOLeg1Weight+ IndividualWeight	
+		Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+
+
+Function f_getWeightAndBaggageCountP2PwithoutOncarriage(WOP2PBaggage,WOP2PWeight)
+	WOP2PBaggage=0
+	WOP2PWeight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Oncarriage Baggage (ONB)"
+	wait 3
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	
+	
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			WOP2PBaggage=WOP2PBaggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			WOP2PWeight=WOP2PWeight+ IndividualWeight		
+		Next
+	End if 
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+Function f_getWeightAndBaggageCountLeg2withoutOncarriage(WOLeg2Baggage,WOLeg2Weight)
+	WOLeg2Baggage=0
+	WOLeg2Weight=0
+	CM_CloseAllTabs
+	environment.Value("e_From") = environment.Value("e_ArrivalPort")
+	''RunAction "CM_SearchFlight [CM_SearchFlight]", oneIteration
+	CM_SearchFlight
+	
+   	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	wait 2
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Include/Exclude|Exclude;Filter|Oncarriage Baggage (ONB)"
+	wait 3
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(1)","Filter|Baggage Acceptance Status (BAS);Value|Accepted (AC)"
+	
+	
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+	Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	For i = 0 To Cint(Baggageacc)-1 Step 1
+		Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+		Baggagedetails=environment.value("cthFltnum")
+		splitbaggagedetails= split(Baggagedetails," ")
+		Baggage=Split(splitbaggagedetails(2),"=")
+		Baggagenum=Split(splitbaggagedetails(1),"=")
+		IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+		WOLeg2Baggage=WOLeg2Baggage+IndividualBagnum
+		IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+		WOLeg2Weight=WOLeg2Weight+ IndividualWeight		
+	Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+Function f_getWeightAndBaggageCountOnCarriageLeg1(Leg1Baggage,Leg1Weight)
+	Leg1Baggage=0
+	Leg1Weight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPort")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Oncarriage Baggage (ONB)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Common_CMScreenCheck "Customer List"
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			Leg1Baggage=Leg1Baggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			Leg1Weight=Leg1Weight+ IndividualWeight	
+		Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+
+
+Function f_getWeightAndBaggageCountOnCarriageP2P(P2PBaggage,P2PWeight)
+	P2PBaggage=0
+	P2PWeight=0
+	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Oncarriage Baggage (ONB)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+		Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+		For i = 0 To Cint(Baggageacc)-1 Step 1
+			Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+			Baggagedetails=environment.value("cthFltnum")
+			splitbaggagedetails= split(Baggagedetails," ")
+			Baggage=Split(splitbaggagedetails(2),"=")
+			Baggagenum=Split(splitbaggagedetails(1),"=")
+			IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+			P2PBaggage=P2PBaggage+IndividualBagnum
+			IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+			P2PWeight=P2PWeight+ IndividualWeight		
+		Next
+	End if 
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+
+
+Function f_getWeightAndBaggageCountOnCarriageLeg2(Leg2Baggage,Leg2Weight)
+	Leg2Baggage=0
+	Leg2Weight=0
+	CM_CloseAllTabs
+	environment.Value("e_From") = environment.Value("e_ArrivalPort")
+	''RunAction "CM_SearchFlight [CM_SearchFlight]", oneIteration
+	CM_SearchFlight
+	
+   	JavaWindow("wndCM").JavaButton("btnCustomerList").Click
+	Common_CMScreenCheck "Customer List Selection"
+	'Common_SelectRow "wndCM", "tblInnerTable", "List Type|All Customers(ALL)"
+	JavaWindow("wndCM").JavaList("lstTo").Select environment.Value("e_ArrivalPortL2")
+	JavaWindow("wndCM").JavaList("lstCustomerFilter").Select "Joining Only"
+	JavaWindow("wndCM").JavaButton("btnAdvancedOptions").Click
+	Common_SetTableValue "wndCM","tblCustomerListFilter","ROW(0)","Filter|Oncarriage Baggage (ONB)"
+	JavaWindow("wndCM").JavaButton("btnDisplay").Click
+	If JavaWindow("wndCM").JavaTable("tblCustomerList").GetCellData(0,0)<>"No matching customers found" Then
+	Baggageacc=JavaWindow("wndCM").JavaTable("tblCustomerList").GetROProperty("rows")
+	For i = 0 To Cint(Baggageacc)-1 Step 1
+		Common_GetTableValue "wndCM", "tblCustomerList", "ROW("&i&")", "COL(11)|cthFltnum"
+		Baggagedetails=environment.value("cthFltnum")
+		splitbaggagedetails= split(Baggagedetails," ")
+		Baggage=Split(splitbaggagedetails(2),"=")
+		Baggagenum=Split(splitbaggagedetails(1),"=")
+		IndividualBagnum=Cint(trim(Replace(Baggagenum(1),"]","")))
+		Leg2Baggage=Leg2Baggage+IndividualBagnum
+		IndividualWeight=Cint(trim(Replace(Baggage(1),"]","")))
+		Leg2Weight=Leg2Weight+ IndividualWeight		
+	Next
+	End If
+	JavaWindow("wndCM").JavaButton("btnDone").Click
+End Function
+Function Customer_Acceptance(recloc, sBagInfo,sNoOfCustomer)
+	
+		'' Set different dynamic waits for diffrent enviroment
+		If ucase(Environment("TestEnv_Connection"))="DEV" Then
+			sGenericWait=15
+			sMoreWait=60
+		Else
+			sGenericWait=5
+			sMoreWait=30
+		End If
+		
+		environment.Value("e_BookingRefNo")= recloc
+		environment.Value("e_IDCType") = 2
+		
+		CM_IDCustomer
+		If JavaWindow("wndCM").JavaButton("btnSelect").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnSelect").Click
+		End If
+		
+			If JavaWindow("wndCM").JavaButton("btnSelect").Exist(sGenericWait) Then
+				If JavaWindow("wndCM").JavaEdit("txtSelectCus").GetROProperty("text")="" Then
+					JavaWindow("wndCM").JavaEdit("txtSelectCus").Set "1-"&sNoOfCustomer
+		        End If
+		        JavaWindow("wndCM").JavaButton("btnSelect").Click
+			End If
+			
+			Common_CMScreenCheck "Customer Acceptance"
+			
+			If JavaWindow("wndCM").JavaEdit("txtSelectCustomer").GetROProperty("text")="" Then
+				JavaWindow("wndCM").JavaEdit("txtSelectCustomer").Set "1-"&sNoOfCustomer
+	       End If
+			
+	
+	
+			If JavaWindow("wndCM").JavaList("lstOverride").Exist(sGenericWait) Then
+				JavaWindow("wndCM").JavaList("lstOverride").Select "Yes"
+				JavaWindow("wndCM").JavaButton("btnProceed").Click
+			End If
+			 
+			If JavaWindow("wndCM").JavaList("lstCollect").Exist(sGenericWait) Then
+				JavaWindow("wndCM").JavaList("lstCollect").Select "Skip"
+				JavaWindow("wndCM").JavaButton("btnProceed").Click
+			End If
+			
+		'JavaWindow("wndCM").JavaList("lstCustomerhasbags").Select sBagInfo
+		'JavaWindow("wndCM").JavaButton("btnAccept").Click
+		
+		If JavaWindow("wndCM").JavaButton("btnProceed").Exist Then
+	JavaWindow("wndCM").JavaButton("btnProceed").Click
+End If
+
+If JavaWindow("wndCM").JavaButton("btnConfirm").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+		End If
+If JavaWindow("wndCM").JavaButton("btnProceed").Exist Then
+	JavaWindow("wndCM").JavaButton("btnProceed").Click
+End If
+wait 2
+If JavaWindow("wndCM").JavaEdit("txtEscortsurname1").Exist Then
+	JavaWindow("wndCM").JavaEdit("txtEscortsurname1").Set "Y"
+End If
+
+wait 3
+
+If JavaWindow("wndCM").JavaButton("btnConfirm").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+End If
+If JavaWindow("wndCM").JavaList("lstOverride").Exist(sGenericWait) Then
+				JavaWindow("wndCM").JavaList("lstOverride").Select "Yes"
+				JavaWindow("wndCM").JavaButton("btnProceed").Click
+			End If
+If JavaWindow("wndCM").JavaButton("btnAccept").Exist Then
+	JavaWindow("wndCM").JavaButton("btnAccept").Click
+End If
+
+a_GetCurrentScreenName=split(replace(replace(replace(JavaWindow("wndCM").JavaObject("objBreadCrumbTrail").Object.toString, ",,","~|~"),",","~|~"),":","~|~"),"~|~")
+CMGetCMScreen =  a_GetCurrentScreenName(ubound(a_GetCurrentScreenName))
+
+If CMGetCMScreen = "Add Gender" Then
+	For Iterator = 1 To cInt(JavaWindow("wndCM").JavaTable("tblCustomerRecord").GetROProperty("rows"))/2 Step 1
+		If JavaWindow("wndCM").JavaButton("btnConfirm").Exist Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+			wait 3
+		Else 
+			Exit for 	
+		End If
+	Next
+End If
+wait 3
+If JavaWindow("wndCM").JavaButton("btnConfirm").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+		End If
+
+If JavaWindow("wndCM").JavaButton("btnAccept").Exist Then
+	If JavaWindow("wndCM").JavaButton("btnAccept").GetROProperty("enabled") Then
+		JavaWindow("wndCM").JavaButton("btnAccept").Click
+	End If
+End If
+
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaEdit("txtEnterYorN").Set "N"
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("wndWarning").Exist Then
+	JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnOK").Click
+End If
+wait(2)
+If JavaWindow("wndCM").JavaDialog("dlgInformation").Exist Then
+	JavaWindow("wndCM").JavaDialog("dlgInformation").JavaButton("btnOK").Click
+End If
+		
+End Function
+Function f_CustomerAcceptancewithBaggage(recloc,sBagInfo,sNoOfCustomer)
+	
+		'' Set different dynamic waits for diffrent enviroment
+		If ucase(Environment("TestEnv_Connection"))="DEV" Then
+			sGenericWait=15
+			sMoreWait=60
+		Else
+			sGenericWait=5
+			sMoreWait=30
+		End If
+		
+		environment.Value("e_BookingRefNo")= recloc
+		environment.Value("e_IDCType") = 2
+		
+		CM_IDCustomer
+		If JavaWindow("wndCM").JavaButton("btnSelect").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnSelect").Click
+		End If 
+		
+		wait 10
+		
+			If JavaWindow("wndCM").JavaButton("btnSelect").Exist(sGenericWait) Then
+				If JavaWindow("wndCM").JavaEdit("txtSelectCus").GetROProperty("text")="" Then
+					JavaWindow("wndCM").JavaEdit("txtSelectCus").Set "1-"&sNoOfCustomer
+		        End If
+		        JavaWindow("wndCM").JavaButton("btnSelect").Click
+			End If
+			
+			Common_CMScreenCheck "Customer Acceptance"
+			
+			If JavaWindow("wndCM").JavaEdit("txtSelectCustomer").GetROProperty("text")="" Then
+				JavaWindow("wndCM").JavaEdit("txtSelectCustomer").Set "1-"&sNoOfCustomer
+	       End If
+			
+	
+	
+			If JavaWindow("wndCM").JavaList("lstOverride").Exist(sGenericWait) Then
+				JavaWindow("wndCM").JavaList("lstOverride").Select "Yes"
+				JavaWindow("wndCM").JavaButton("btnProceed").Click
+			End If
+			 
+			If JavaWindow("wndCM").JavaList("lstCollect").Exist(sGenericWait) Then
+				JavaWindow("wndCM").JavaList("lstCollect").Select "Skip"
+				JavaWindow("wndCM").JavaButton("btnProceed").Click
+			End If
+			
+		'JavaWindow("wndCM").JavaList("lstCustomerhasbags").Select sBagInfo
+		'JavaWindow("wndCM").JavaButton("btnAccept").Click
+		
+		If JavaWindow("wndCM").JavaButton("btnProceed").Exist Then
+	JavaWindow("wndCM").JavaButton("btnProceed").Click
+End If
+If JavaWindow("wndCM").JavaButton("btnConfirm").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+		End If
+If JavaWindow("wndCM").JavaButton("btnProceed").Exist Then
+	JavaWindow("wndCM").JavaButton("btnProceed").Click
+End If
+wait 2
+If JavaWindow("wndCM").JavaEdit("txtEscortsurname1").Exist Then
+	JavaWindow("wndCM").JavaEdit("txtEscortsurname1").Set "Y"
+End If
+
+wait 3
+
+If JavaWindow("wndCM").JavaButton("btnConfirm").Exist(sGenericWait) Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+End If
+
+
+'If JavaWindow("wndCM").JavaButton("btnAccept").Exist Then
+'	JavaWindow("wndCM").JavaButton("btnAccept").Click
+'End If
+'
+a_GetCurrentScreenName=split(replace(replace(replace(JavaWindow("wndCM").JavaObject("objBreadCrumbTrail").Object.toString, ",,","~|~"),",","~|~"),":","~|~"),"~|~")
+CMGetCMScreen =  a_GetCurrentScreenName(ubound(a_GetCurrentScreenName))
+
+If CMGetCMScreen = "Add Gender" Then
+	For Iterator = 1 To cInt(JavaWindow("wndCM").JavaTable("tblCustomerRecord").GetROProperty("rows"))/2 Step 1
+		If JavaWindow("wndCM").JavaButton("btnConfirm").Exist Then
+			JavaWindow("wndCM").JavaButton("btnConfirm").Click
+			wait 3
+		Else 
+			Exit for 	
+		End If
+	Next
+End If
+wait 25
+JavaWindow("wndCM").JavaEdit("txtHoldBaggage").Set environment.value("Baggagenum")
+JavaWindow("wndCM").JavaEdit("txtBaggageHoldWeight").Set environment.value("Baggageweight")
+
+
+If JavaWindow("wndCM").JavaButton("btnAccept").Exist Then
+	If JavaWindow("wndCM").JavaButton("btnAccept").GetROProperty("enabled") Then
+		JavaWindow("wndCM").JavaButton("btnAccept").Click
+	End If
+End If
+
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaEdit("txtEnterYorN").Set "N"
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnYes").Click
+End If
+If JavaWindow("wndCM").JavaDialog("wndWarning").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("wndWarning").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnOK").Click
+End If
+wait(2)
+If JavaWindow("wndCM").JavaDialog("dlgInformation").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgInformation").JavaButton("btnOK").Click
+End If
+		
+End Function
+
+Function f_CustomerStandby(recloc)
+
+  environment.Value("e_BookingRefNo")= recloc
+  environment.Value("e_IDCType") = 2
+  		
+  CM_IDCustomer
+  JavaWindow("wndCM").JavaButton("btnSelect").Click
+  wait 2
+  JavaWindow("wndCM").JavaCheckBox("chkAcceptance").Set "ON"
+  JavaWindow("wndCM").JavaMenu("mnuCancelAcceptance").Select
+  JavaWindow("wndCM").JavaEdit("txtSelectCustomer").Set "1"
+  JavaWindow("wndCM").JavaList("lstUpdateStatusto").Select "Standby"
+  JavaWindow("wndCM").JavaButton("btnCancelAcceptance").Click
+  Common_ValidateTableText "wndCM", "tblCPTable","Row(1)", "Accept", "SBY"
+  If InStr(JavaWindow("wndCM").JavaObject("tblCustomerRecord-Info").Object.getCellText(1,(Common_ColumnIndex("wndCM","tblCustomerRecord","Accept")),","), "SBY") > 0 Then
+  	Reporter.ReportEvent micPass,"Customer Status","Customer on SBY"
+  else
+  	Reporter.ReportEvent micFail,"Customer Status","Customer NOT on SBY"
+  	ExitTest
+  End If
+  
+  JavaWindow("wndCM").JavaCheckBox("chkBaggage").Set "ON"
+  JavaWindow("wndCM").JavaMenu("mnuDisplayBaggage").Select
+  
+  Common_CMScreenCheck "Baggage Display"
+  Common_SimpleCompare JavaWindow("wndCM").JavaStaticText("stsHoldBaggage").GetROProperty("attached text"), "=", "Hold Baggage:"
+ ' Common_SimpleCompare JavaWindow("wndCM").JavaStaticText("stsCommonWeightField").GetROProperty("attached text"), "=", "" ' pending if pax changes bag wil change 
+
+End Function 
+
+Function f_AddCustomerBaggage(Bookingef)
+environment.Value("e_BookingRefNo")=Bookingef
+Environment.value("e_IDCType")=2
+Call CM_IDCustomer
+JavaWindow("wndCM").JavaButton("btnSelect").Click
+JavaWindow("wndCM").JavaCheckBox("chkBaggage").Set "ON"
+JavaWindow("wndCM").JavaMenu("mnuAddBags").Select
+Common_CMScreenCheck "Add Bag"
+JavaWindow("wndCM").JavaEdit("txtAdditionalHoldBaggagePieces").Set environment.value("Baggagenum")
+JavaWindow("wndCM").JavaEdit("txtBaggageHoldWeight").Set environment.value("Baggageweight")
+JavaWindow("wndCM").JavaButton("btnAddBag").Click
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaEdit("txtEnterYorN").Set "N"
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnOK").Click
+End If
+If JavaWindow("wndCM").JavaDialog("dlgQuestion").Exist(5) Then
+	JavaWindow("wndCM").JavaDialog("dlgQuestion").JavaButton("btnYes").Click
+End If
+If JavaWindow("wndCM").JavaDialog("wndWarning").Exist Then
+	JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnOK").Click
+End If
+wait(2)
+Common_ValidateIcons "wndCM","tblCPTable","ROW(1)","Baggage","bag.gif"
+Common_CMMessageAreaCheck "1 bag accepted"
+End Function
+
+
+
+Function waitforit()
+maxwait = 0
+Do	
+	If JavaWindow("wndAltéaDepartureControl").JavaStaticText("labActivityProgress").GetROProperty("text") = "" Then
+		gonogo = 1
+	else
+		wait 1
+		If maxwait > 30 Then
+			Reporter.ReportEvent micFail,"FM page load","waited too long, may kill TC"
+			ExitTest
+		End If
+		maxwait = maxwait+1
+	End If
+Loop While gonogo <> 1
+End Function
+
+
+Function f_FMLogin(testdate)
+	If environment.Value("FMLaunchloc") = "" Then
+		'RunAction "FM_Login [FM_Login]", oneIteration
+		FM_Login
+	Else 
+		SystemUtil.Run "1A-Launcher.exe", "--conf.file=cfg/cfg.ini --workstationID=1A/C/LON/B/ASL/LCO//* --airlineCode=1A --airlineNumericID=001 --platform=NATIVE --fmConfig=TST --win.env.resetList=deactivated", environment.Value("FMLaunchloc")
+		'RunAction "FM_Login [FM_Login]", oneIteration
+		FM_Login
+	End If
+	wait 3
+	If JavaWindow("wndAltéaDepartureControl").JavaDialog("wndInformation").Exist Then
+		JavaWindow("wndAltéaDepartureControl").JavaDialog("wndInformation").JavaButton("buttonInformationOK").Click
+	End  If
+	wait 5	
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnWelcomeOK").Click
+	
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnCustomisedSearch").Click
+	
+	wait 5
+	
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaButton("btnReset").Click
+	wait 2
+	
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtDepartureDate").Type testdate
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtToDateRange").Type testdate
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtCarrierCode").Type environment.Value("e_AirlineCode")
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtFlightNumbers").Type environment.Value("e_FlightNo")
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaButton("btnSearch").Click
+
+End Function
+
+Function f_FMValidatePassengerPageLeg1(P2PAcceptancecount,Leg1Acceptancecount,P2PBookingcount,FMLeg1Bookingcount,Passengerbooked,testdate)
+wait 120
+	JavaWindow("wndAltéaDepartureControl").Activate
+	Leg1andp2p=Cint(P2PAcceptancecount)+Cint(Leg1Acceptancecount)
+	bookLeg1andp2p=Cint(P2PBookingcount)+Cint(FMLeg1Bookingcount)
+	
+	Call waitforit()
+	
+	Common_SelectRow "wndAltéaDepartureControl","tblSupervisorShiftSummary","Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";COL(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_DepaturePort")
+	'wait 3
+	'JavaWindow("wndAltéaDepartureControl").JavaTable("tblSupervisorShiftSummary").Click 1,1,"RIGHT"
+	'wait 3
+	'JavaWindow("wndAltéaDepartureControl").JavaMenu("mnuPassenger").Select
+	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+
+	Call waitforit()
+	
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , UCase(testdate)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_DepaturePort")&"-"&environment.Value("e_ArrivalPort")&"+"
+	wait 2
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|"&environment.Value("e_ArrivalPort"),"Booked|envLeg1Bookingcount" 
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|"&environment.Value("e_ArrivalPortL2"),"Booked|envLeg2Bookingcount"
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|Total","Booked|envPassengerbooked"
+	
+	txtLeg1Bookingcount=environment.Value("envLeg1Bookingcount")
+	SplittxtLeg1Bookingcount=Split(txtLeg1Bookingcount,"/")
+	txtLeg1Bookingcount=SplittxtLeg1Bookingcount(2)
+	
+	txtLeg2Bookingcount=environment.Value("envLeg2Bookingcount")
+	SplittxtLeg2Bookingcount=Split(txtLeg2Bookingcount,"/")
+	txtLeg2Bookingcount=SplittxtLeg2Bookingcount(2)
+	
+	txtPassengerbooked=environment.Value("envPassengerbooked")
+	SplittxtPassengerbooked=Split(txtPassengerbooked,"/")
+	txtPassengerbooked=SplittxtPassengerbooked(2)
+	
+	
+'	If Cstr(txtLeg1Bookingcount)=  Cstr(FMLeg1Bookingcount) and Cstr(txtLeg2Bookingcount) = Cstr(P2PBookingcount) and Cstr(txtPassengerbooked) = Cstr(bookLeg1andp2p) Then
+'		Reporter.ReportEvent micPass,"FM Passenger page BOO Leg1","Passengers show as booked in passenger screen"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Passenger page BOO Leg1","Passengers NOT show as booked in passenger screen"
+'		'ExitTest
+'	End If
+'	
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|"&environment.Value("e_ArrivalPort"),"Accepted|CSA1BCDG2" 
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|"&environment.Value("e_ArrivalPortL2"),"Accepted|CSA1BLHR2"
+	Common_GetTableValue "wndAltéaDepartureControl","tblSaleableConfig","Port|Total","Accepted|envLeg1andp2p"
+	
+	txtLeg1andp2p=environment.Value("envLeg1andp2p")
+	SplittxtLeg1andp2p=Split(txtLeg1andp2p,"/")
+	txtLeg1andp2p=SplittxtLeg1andp2p(2)
+	
+	
+	If Cstr(txtLeg1andp2p) = Cstr(Leg1andp2p) Then
+		Reporter.ReportEvent micPass,"FM Passenger page CSA Leg1","Passengers show as accepted in passenger screen"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page CSA Leg1","Passengers NOT show as accepted in passenger screen"
+		'ExitTest
+	End If
+End Function
+
+Function f_FMValidateInformationPageLeg1(P2PAcceptancecount,Leg1Acceptancecount,P2PBookingcount,FMLeg1Bookingcount)
+	Leg1andp2p=Cint(P2PAcceptancecount)+Cint(Leg1Acceptancecount)
+	bookLeg1andp2p=Cint(P2PBookingcount)+Cint(FMLeg1Bookingcount)
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Flight Information"
+	Call waitforit()
+	
+'	If Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblJoiningPassengers").GetCellData(0,"Y")) = Cstr(bookLeg1andp2p) Then
+'		Reporter.ReportEvent micPass,"FM Flight Information L1 BOO","Flight Information screen the passengers does exist on L1"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Flight Information L1 BOO","Flight Information screen the passengers does not exist on L1"
+'		'ExitTest	
+'	End If 
+'	
+	If Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblJoiningPassengers").GetCellData(1,"Y")) = Cstr(Leg1andp2p) Then
+		Reporter.ReportEvent micPass,"FM Flight Information L1 CSA","Flight Information screen the passengers exist on L1"
+	Else
+		Reporter.ReportEvent micPass,"FM Flight Information L1 CSA","Flight Information screen the passengers does not exist on L1"
+		'ExitTest	
+	End If 
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	Call waitforit()
+End Function
+
+Function f_FMValidatePassengerPageLeg2(P2PAcceptancecount,Leg2Acceptancecount,FMLeg2Bookingcount,Passengerbooked,testdate,P2PBookingcount,P2PInfantcount)
+wait 120
+Leg2andp2p=Cint(P2PAcceptancecount)+Cint(Leg2Acceptancecount)
+bookLeg2andp2p=Cint(P2PBookingcount)+Cint(FMLeg2Bookingcount)
+
+	Common_SelectRow "wndAltéaDepartureControl", "tblSupervisorShiftSummary", "Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";Col(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_ArrivalPort")
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+	wait 3
+	Call waitforit()
+	' Common_SimpleCompare(s_Param1, s_Condition, s_Param2)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , UCase(testdate)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_ArrivalPort")&"-"&environment.Value("e_ArrivalPortL2")
+	P2PBookingcount=Cint(P2PBookingcount)-Cint(P2PInfantcount)
+	' Common_ValidateTableValues(s_window, s_tableStr, s_search, s_Validate)
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|TRANSIT", "Booked|envP2PBookingcount"
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|"&environment.Value("e_ArrivalPortL2"), "Booked|envLeg2Bookingcount"
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|Total", "Booked|envPassengerbooked"
+	
+	txtP2PBookingcount=environment.Value("envP2PBookingcount")
+	SplittxtP2PBookingcount=Split(txtP2PBookingcount,"/")
+	txtP2PBookingcount=SplittxtP2PBookingcount(2)
+	
+	txtLeg2Bookingcount=environment.Value("envLeg2Bookingcount")
+	SplittxtLeg2Bookingcount=Split(txtLeg2Bookingcount,"/")
+	txtLeg2Bookingcount=SplittxtLeg2Bookingcount(2)
+	
+	txtPassengerbooked=environment.Value("envPassengerbooked")
+	SplittxtPassengerbooked=Split(txtPassengerbooked,"/")
+	txtPassengerbooked=SplittxtPassengerbooked(2)
+	
+	
+'	If Cstr(txtP2PBookingcount)=  Cstr(P2PBookingcount) and Cstr(txtLeg2Bookingcount) = Cstr(FMLeg2Bookingcount) and Cstr(txtPassengerbooked) = Cstr(bookLeg2andp2p) Then
+'		Reporter.ReportEvent micPass,"FM Passenger page BOO Leg2","Passengers show as booked in passenger screen"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Passenger page BOO Leg2","Passengers NOT show as booked in passenger screen"
+'		'ExitTest
+'	End If
+	
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|TRANSIT", "Accepted|envP2PAcceptancecount"
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|"&environment.Value("e_ArrivalPortL2"), "Accepted|envLeg2Acceptancecount"
+	Common_GetTableValue "wndAltéaDepartureControl", "tblSaleableConfig", "Port|Total", "Accepted|envLeg2andp2p"
+	
+	
+	
+	txtP2PAcceptancecount=environment.Value("envP2PAcceptancecount")
+	SplittxtP2PAcceptancecount=Split(txtP2PAcceptancecount,"/")
+	txtP2PAcceptancecount=SplittxtP2PAcceptancecount(2)
+	
+	txtLeg2Acceptancecount=environment.Value("envLeg2Acceptancecount")
+	SplittxtLeg2Acceptancecount=Split(txtLeg2Acceptancecount,"/")
+	txtLeg2Acceptancecount=SplittxtLeg2Acceptancecount(2)
+	
+	txtLeg2andp2p=environment.Value("envLeg2andp2p")
+	SplittxtLeg2andp2p=Split(txtLeg2andp2p,"/")
+	txtLeg2andp2p=SplittxtLeg2andp2p(2)
+	
+	
+	
+	If Cstr(txtLeg2andp2p) = Cstr(Leg2andp2p) Then
+		Reporter.ReportEvent micPass,"FM Passenger page CSA Leg2","Passengers show as accepted in passenger screen"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page CSA Leg2","Passengers NOT show as accepted in passenger screen"
+		'ExitTest
+	End If
+
+End  Function
+
+Function f_FMValidateInformationPageLeg2(P2PAcceptancecount,Leg2Acceptancecount,FMLeg2Bookingcount)
+Leg2andp2p=Cint(P2PAcceptancecount)+Cint(Leg2Acceptancecount)
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Flight Information"
+	Call waitforit()
+	
+	If Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblJoiningPassengers").GetCellData(0,"Y")) = Cstr(FMLeg2Bookingcount) Then
+		Reporter.ReportEvent micPass,"FM Flight Information L2 BOO","Flight Information screen the passengers exist on L2"
+	Else
+		Reporter.ReportEvent micFail,"FM Flight Information L2 BOO","Flight Information screen the passengers does not exist on L2"
+		'ExitTest	
+	End If 
+	
+'	If JavaWindow("wndAltéaDepartureControl").JavaTable("tblJoiningPassengers").GetCellData(1,"Y") = Cstr(Leg2Acceptancecount) Then
+'		Reporter.ReportEvent micPass,"FM Flight Information L2 CSA","Flight Information screen the passengers does not exist on L2"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Flight Information L2 CSA","Flight Information screen the passengers show as booked on L2"
+'		'ExitTest	
+'	End If 
+
+wait 5
+JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+
+End  Function
+
+Function f_FMValidatePassengerWeightBaggageLeg1(testdate,Leg1Baggage,Leg1Weight,P2PBaggage,P2PWeight)
+	JavaWindow("wndAltéaDepartureControl").Activate
+	Leg1p2pBaggage=Cint(Leg1Baggage)+Cint(P2PBaggage)
+	Leg1p2pWeight=Cint(Leg1Weight)+Cint(P2PWeight)
+	'JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	'Call waitforit()
+	wait 5
+	Common_SelectRow "wndAltéaDepartureControl", "tblSupervisorShiftSummary", "Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";Col(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_DepaturePort")
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+	wait 3
+	Call waitforit()
+	
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , uCase(testdate)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_DepaturePort")&"-"&environment.Value("e_ArrivalPort")&"+"
+	wait 2
+	BagColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","P:Y"))
+	WeightColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","W:Y"))
+
+
+ 	txtLeg1bagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,BagColnum))
+ 	txtLeg1bagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,WeightColnum))
+ 
+ 	txtP2Pbagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,BagColnum))
+ 	txtP2Pbagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,WeightColnum))
+
+	
+'	If txtLeg1bagcount<>""  and txtLeg1bagweight<>"" Then
+'			
+'		If Cstr(txtLeg1bagcount) = Cstr(Leg1Baggage) and Cstr(txtLeg1bagweight) = Cstr(Leg1Weight) Then
+'			Reporter.ReportEvent micPass,"FM Passenger page CSA D_CDG","Bags shown in passenger screen for CDG"
+'		Else
+'			Reporter.ReportEvent micFail,"FM Passenger page CSA D_CDG","Bags NOT shown in passenger screen for CDG"
+'			'ExitTest
+'		End If
+'	
+'		
+'	End If
+'	If txtP2Pbagcount<>""  and txtP2Pbagweight<>"" Then
+'		If Cstr(txtP2Pbagcount) =  Cstr(P2PBaggage) and Cstr(txtP2Pbagweight) =  Cstr(P2PWeight)  Then
+'			Reporter.ReportEvent micPass,"FM Passenger page CSA D_LHR","Bags shown in passenger screen for LHR"
+'		Else
+'			Reporter.ReportEvent micFail,"FM Passenger page CSA D_LHR","Bags NOT shown in passenger screen for LHR"
+'			'ExitTest
+'		End If
+'	End If
+	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	Call waitforit()
+End Function
+
+Function f_FMValidatePassengerWeightBaggageOncarriageLeg1(testdate,OCLeg1Baggage,OCLeg1Weight,OCP2PBaggage,OCP2PWeight)
+JavaWindow("wndAltéaDepartureControl").Activate
+	Leg1p2pBaggage=Cint(Leg1Baggage)+Cint(P2PBaggage)
+	Leg1p2pWeight=Cint(Leg1Weight)+Cint(P2PWeight)
+Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , uCase(testdate)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_DepaturePort")&"-"&environment.Value("e_ArrivalPort")&"+"
+	wait 2
+	BagColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","P:T"))
+	WeightColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","W:T"))
+
+
+ 	txtLeg1bagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,BagColnum))
+ 	txtLeg1bagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,WeightColnum))
+ 
+ 	txtP2Pbagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,BagColnum))
+ 	txtP2Pbagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,WeightColnum))
+
+	
+	
+'	If Cstr(txtLeg1bagcount) = Cstr(OCLeg1Baggage) and Cstr(txtLeg1bagweight) = Cstr(OCLeg1Weight) Then
+'		Reporter.ReportEvent micPass,"FM Passenger page Leg1 Baggage","Bags shown in passenger screen for CDG"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Passenger page Leg1 Baggage","Bags NOT shown in passenger screen for CDG"
+'		ExitTest
+'	End If
+	
+'	If Cstr(txtP2Pbagcount) =  Cstr(OCP2PBaggage) and Cstr(txtP2Pbagweight) =  Cstr(OCP2PWeight)  Then
+'		Reporter.ReportEvent micPass,"FM Passenger page P2P Baggage","Bags shown in passenger screen for LHR"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Passenger page P2P Baggage","Bags NOT shown in passenger screen for LHR"
+'		'ExitTest
+'	End If
+	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	Call waitforit()
+
+End Function 
+Function f_FMValidatePassengerWeightBaggageOnCarriageLeg2(testdate,OCLeg2Baggage,OCLeg2Weight,OCP2PBaggage,OCP2PWeight)
+	Leg2p2pBaggage=Cint(Leg2Baggage)+Cint(P2PBaggage)
+	Leg2p2pWeight=Cint(Leg2Weight)+Cint(P2PWeight)
+	
+	Call waitforit()
+	' Common_SimpleCompare(s_Param1, s_Condition, s_Param2)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , UCase(testdate) 
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_ArrivalPort")&"-"&environment.Value("e_ArrivalPortL2")
+	wait 2
+	BagColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","P:T"))
+	WeightColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","W:T"))
+
+
+ txtLeg2bagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,BagColnum))
+ txtLeg2bagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,WeightColnum))
+ 
+ txtP2Pbagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,BagColnum))
+ txtP2Pbagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,WeightColnum))
+
+	
+	If txtP2Pbagcount=  "" and txtP2Pbagweight =  ""  Then
+		Reporter.ReportEvent micPass,"FM Passenger page P2P Baggage","Bags NOT shown in passenger screen for TRANSIT"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page P2P Baggage","Bags shown in passenger screen for  TRANSIT"
+		'ExitTest
+	End If
+	
+	
+	
+'	If Cstr(txtLeg2bagcount) = Cstr(OCLeg2Baggage) and Cstr(txtLeg2bagweight) = Cstr(OCLeg2Weight) Then
+'		Reporter.ReportEvent micPass,"FM Passenger page Leg2 Baggage","Bags shown in passenger screen for  leg 2"
+'	Else
+'		Reporter.ReportEvent micFail,"FM Passenger page Leg2 Baggage","Bags NOT shown in passenger screen for  leg 2"
+'		'ExitTest
+'	End If
+
+
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+End Function	
+
+
+
+Function f_FMValidatePassengerWeightBaggageLeg2(testdate,Leg2Baggage,Leg2Weight,P2PBaggage,P2PWeight)
+	Leg2p2pBaggage=Cint(Leg2Baggage)+Cint(P2PBaggage)
+	Leg2p2pWeight=Cint(Leg2Weight)+Cint(P2PWeight)
+	Common_SelectRow "wndAltéaDepartureControl", "tblSupervisorShiftSummary", "Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";COL(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_ArrivalPort")
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+	wait 3
+	Call waitforit()
+	' Common_SimpleCompare(s_Param1, s_Condition, s_Param2)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , UCase(testdate) 
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_ArrivalPort")&"-"&environment.Value("e_ArrivalPortL2")
+	wait 2
+	BagColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","P:Y"))
+	WeightColnum=Cint(Common_GetGroupHeaderIndex("wndAltéaDepartureControl","tblBaggage","W:Y"))
+
+
+ txtLeg2bagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,BagColnum))
+ txtLeg2bagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(1,WeightColnum))
+ 
+ txtP2Pbagcount=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,BagColnum))
+ txtP2Pbagweight=Cstr(JavaWindow("wndAltéaDepartureControl").JavaTable("tblBaggage").GetCellData(0,WeightColnum))
+
+	
+	If txtP2Pbagcount=  "" and txtP2Pbagweight =  ""  Then
+		Reporter.ReportEvent micPass,"FM Passenger page CSA D_TRAN_L2","Bags NOT shown in passenger screen for TRANSIT"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page CSA D_TRAN_L2","Bags shown in passenger screen for LHR TRANSIT"
+		'ExitTest
+	End If
+	
+	
+'	If txtLeg2bagcount<>""  and txtLeg2bagweight<>"" Then
+'		If Cstr(txtLeg2bagcount) = Cstr(Leg2Baggage) and Cstr(txtLeg2bagweight) = Cstr(Leg2Weight) Then
+'			Reporter.ReportEvent micPass,"FM Passenger page CSA D_LHR_L2","Bags shown in passenger screen for LHR leg 2"
+'		Else
+'			Reporter.ReportEvent micFail,"FM Passenger page CSA D_LHR_L2","Bags NOT shown in passenger screen for LHR leg 2"
+'			'ExitTest
+'		End If
+'	End If	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+End Function
+
+Function f_FMValidatePassengeInfantLeg1(testdate,Leg1Acceptancecount,P2PAcceptancecount,P2PInfantcount)
+	JavaWindow("wndAltéaDepartureControl").Activate
+	Leg1p2pBaggage=Cint(Leg1Baggage)+Cint(P2PBaggage)
+	Leg1p2pWeight=Cint(Leg1Weight)+Cint(P2PWeight)
+	'JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	Call waitforit()
+	Common_SelectRow "wndAltéaDepartureControl", "tblSupervisorShiftSummary", "Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";COL(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_DepaturePort")
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+	wait 3
+	Call waitforit()
+	
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , uCase(testdate)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_DepaturePort")&"-"&environment.Value("e_ArrivalPort")&"+"
+	
+	
+	
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|"&environment.Value("e_ArrivalPortL2"),"M|txtP2Pcount"
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|"&environment.Value("e_ArrivalPortL2"),"I|Infantcount"
+	
+	
+	
+	If Cstr(environment.Value("txtP2Pcount")) =  Cstr(P2PAcceptancecount) and Cstr(environment.Value("Infantcount")) =  Cstr(P2PInfantcount)  Then
+		Reporter.ReportEvent micPass,"FM Passenger page Infant validation Leg1","Infant shown in passenger screen for  leg 1"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page Infant validation Leg1","Infant NOT shown in passenger screen for  leg 1"
+		'ExitTest
+	End If
+	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+	Call waitforit()
+End Function
+
+Function f_FMValidatePassengerinfantLeg2(testdate,P2PInfantcount,P2PAcceptancecount,Leg2Acceptancecount)
+	Leg2p2pBaggage=Cint(Leg2Baggage)+Cint(P2PBaggage)
+	Leg2p2pWeight=Cint(Leg2Weight)+Cint(P2PWeight)
+	Common_SelectRow "wndAltéaDepartureControl", "tblSupervisorShiftSummary", "Flight|"&environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")&";COL(2)|"& UCase(testdate)&";Dep|"&environment.Value("e_ArrivalPort")
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnFlightInformation").Click	
+	wait 5
+	JavaWindow("wndAltéaDepartureControl").JavaTab("tabMainTab").Select "Passenger"
+	wait 3
+	Call waitforit()
+	' Common_SimpleCompare(s_Param1, s_Condition, s_Param2)
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightNumber").GetROProperty("text"), "=" , environment.Value("e_AirlineCode")&environment.Value("e_FlightNo")
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightDate").GetROProperty("text") , "=" , UCase(testdate) 
+	Common_SimpleCompare JavaWindow("wndAltéaDepartureControl").JavaStaticText("labFlightRoute").GetROProperty("text") , "=" , environment.Value("e_ArrivalPort")&"-"&environment.Value("e_ArrivalPortL2")
+	
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|TRANSIT","M|txtP2Pcount" 
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|TRANSIT","I|Infantcount"
+	
+	
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|"&environment.Value("e_ArrivalPortL2"),"M|txtLeg2accept"
+	Common_GetTableValue "wndAltéaDepartureControl","tblPassengers","Destination|"&environment.Value("e_ArrivalPortL2"),"I|InfantcountLeg2"
+	
+	If Cstr(environment.Value("txtP2Pcount")) =Cstr(P2PAcceptancecount)   and Cstr(environment.Value("Infantcount")) = Cstr(P2PInfantcount)   Then
+		Reporter.ReportEvent micPass,"FM Passenger page Infant validation P2p","Infant NOT shown in passenger screen for TRANSIT"
+	Else
+		Reporter.ReportEvent micFail,"FM Passenger page Infant validation P2P","Infant shown in passenger screen for  TRANSIT"
+		'ExitTest
+	End If
+	
+	
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnShiftSummary").Click
+End Function
+
+
+'************************************************************************************
+'Below fnction belong to the SSCI application
+'************************************************************************************
+
+
+Function pgeSSCI_Identification(s_RecLoc,DateSelt)
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").WebElement("wbeGroupPNR").Click
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").WebEdit("txtPNRInput").Click
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").WebEdit("txtPNRInput").Set s_RecLoc_anks
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").WebList("lstPNRDepartureDate").Select DateSelt
+'	'Browser("Amadeus Services Ltd").Page("Amadeus 6X check-in, Identific").WebList("PNR_DepartureDate").Select "#2"
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").WebButton("btnPNRIdentify").click
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_Identification").Sync
+	Set MyDescription = Description.Create()
+	'MyDescription("Class").Value = "Weblist"
+	MyDescription("html tag").Value = "SELECT"
+	MyDescription("select type").Value = "ComboBox Select"
+	Set obj = Browser("brwWebCheckIn").Page("pgeWEB_Identification").ChildObjects(MyDescription)
+	a=obj.Count
+	obj(0).select DateSelt
+	'Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebList("lstIDepartureDate").Select DateSelt
+	Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebEdit("txtdentificationBookingRef").Set s_RecLoc
+	Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebButton("btnContinue").Click
+End Function
+
+Function pgeSSCI_JourneySelection()
+	'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_JourneySelection").WebButton("btnChangeCheckin").Click
+	Browser("brwWebCheckIn").Page("pgeWEB_Journey").WebButton("btnModifyCheckIn").Click
+End Function
+
+Function pgeSSCI_PassengerSelection(pax2chkin)
+	For IteratorA = 0 To UBound(pax2chkin) Step 1
+		For abb = 1 To 7 Step 1
+			If Browser("brwWebCheckIn").Page("pgeWEB_PassengerSelection").WebElement("wcbPax"+CStr(abb)).Exist Then
+				value = Browser("brwWebCheckIn").Page("pgeWEB_PassengerSelection").WebElement("wcbPax"+CStr(abb)).GetROProperty("outertext")
+				If InStr(value,"Mr") > 0 Then
+					If InStr(value,"Mr") = 1 and InStr(value,"Mrs") = 0 Then
+						value = Right(value, Len(value)-3)
+					Else
+						value = Right(value, Len(value)-4)
+					End If
+				End If
+				value = UCase(value)
+				loct = Len(value) - 2
+				If InStr(loct, value, " ") > 0 Then
+			    	value = trim(value)
+			    End If
+				If InStr(value, "(") > 0 Then 
+					value = Left(value, Len(value) - (InStr(7,value, "(")+3))
+					value = trim(value)
+				End If
+				If value=pax2chkin(IteratorA) Then	
+					If Browser("brwWebCheckIn").Page("pgeWEB_PassengerSelection").WebCheckBox("wcbSelectCheckin"+CStr(abb)).Exist Then
+						Browser("brwWebCheckIn").Page("pgeWEB_PassengerSelection").WebCheckBox("wcbSelectCheckin"+CStr(abb)).Set "ON"
+					Else
+						print "Fail, Unable to select pax or already accepted"
+						ExitTest
+					End If
+				abb=9	
+				ElseIf abb = 9 Then
+					print "Fail, pax not found"
+				End If
+			Else 
+				abb=9
+				print "Fail,unable to select all the required pax"
+				ExitTest
+			End If 
+		Next
+	Next
+	Browser("brwWebCheckIn").Page("pgeWEB_PassengerSelection").WebButton("btnConfirmPassengers").Click
+End Function
+
+
+Function pgeSSCI_Summary()
+	Browser("Amadeus 6X Internet Check-In").Page("Amadeus 6X Internet Check-In").WebList("lstRJourney").Select "No Bag / I don't know yet"
+	If Browser("brwWebCheckIn").Page("pgeWEB_Summary").WebElement("wcbBagCount").GetROProperty("innertext") = 0 Then
+		Reporter.ReportEvent micPass,"Set bags to zero","Bags set to zero"
+		Browser("brwWebCheckIn").Page("pgeWEB_Summary").WebButton("btnConfirmCheckIn").Click
+	Else
+		Reporter.ReportEvent micFail,"Set bags to zero","Unable to set bags to zero"
+		ExitTest
+	End If
+End Function
+
+Function pgeSSCI_ContactDetails()
+	
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").Sync
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").WebEdit("txtssci_mail_emailAddress").Set "ankur@getpax.com"
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").WebList("lstphoneCode_phoneNumer").Select "United Kingdom (+44)"
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").WebEdit("txtssci_phoneNumber").Set "+441212345678"
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").WebButton("btnSaveContactDetails").Click
+		'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_ContactDetails").Sync
+		Browser("brwWebCheckIn").Page("pgeWEB_ContactsDetails").WebEdit("txtssci_mail_emailAddress").Set "ankur@getpax.com"
+		Browser("brwWebCheckIn").Page("pgeWEB_ContactsDetails").WebList("lstphoneCode_phoneNumer").Select "United Kingdom"
+		Browser("brwWebCheckIn").Page("pgeWEB_ContactsDetails").WebEdit("txtssci_phoneNumber").Set "1212345678"
+		Browser("brwWebCheckIn").Page("pgeWEB_ContactsDetails").WebButton("btnContinue").Click
+	
+End Function
+
+Function pgeSSCI_BoardingPassPrinting()
+	Browser("brwWebCheckIn").Page("pgeWEB_BoardingPassPrinting").WebButton("btnContinue").Click
+	wait 3
+	Browser("brwWebCheckIn").Page("pgeWEB_BoardingPassPrinting").WebButton("btnContinue").Click
+End Function
+
+'Function pgeSSCI_JourneyDocuments()
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_JourneyDocuments").WebButton("btnFinishMyCheckin").Click
+'	Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_JourneyDocuments").Sync
+'End Function
+
+Function pgeSSCI_CheckinComplete()
+	'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_CheckinComplete").Link("lnkExitcheckin").Click
+	'Browser("brwSSCI_WebChkIn").Page("pgeSSCIWCI_CheckinComplete").Sync
+	Browser("brwWebCheckIn").Page("pgeWEB_CheckinComplete").Link("lnkQuitCheckIn").Click
+	Reporter.ReportEvent micDone, "WEBSSCI","Pass, End of WebPage CCKI"
+	name = "Ankur"
+End Function
+
+'Function pgeSSCI_HTTP404NotFound()
+'	'Reporter.ReportEvent micDone, "WEBSSCI","Pass, End of WebPage CCKI"
+'	Browser("brwWebCheckIn").Page("pgeWEB_AllDone").WebButton("btnContinue").Click
+'	name = "Ankur"
+'	'Exit Do
+'End Function
+
+Function waitforit()
+maxwait = 0
+Do	
+	If JavaWindow("wndAltéaDepartureControl").JavaStaticText("labActivityProgress").GetROProperty("text") = "" Then
+		gonogo = 1
+	else
+		wait 1
+		If maxwait > 30 Then
+			Reporter.ReportEvent micFail,"FM page load","waited too long, may kill TC"
+			Exit Function
+		End If
+		maxwait = maxwait+1
+	End If
+Loop While gonogo <> 1
+End Function
+
+Function waitforPage()
+print "in waitforPage"
+maxwaitA = 0
+Do	
+	If Browser("brwWebCheckIn").Page("pgeWEB_Identification").Exist  Then
+		gonogoA = 1
+	else
+		wait 1
+		If maxwaitA > 30 Then
+			Reporter.ReportEvent micFail,"FM page load","waited too long, may kill TC"
+			ExitTest
+		End If
+		maxwaitA = maxwaitA+1
+	End If
+Loop While gonogoA <> 1
+End Function
+
+Function waitforload()
+wait 5
+print "in waitforload"
+loadwait = 0
+Do
+print "tik tik one"
+'print Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebElement("html tag:=P", "class:=PageTitle").GetROProperty("innertext")
+print "1>"&Browser("brwWebCheckIn").Exist
+print "2>"&Browser("brwWebCheckIn").Page("pgeWEB_Identification").Exist
+print "3>"&Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebElement("html tag:=P", "class:=PageTitle").Exist
+print "4>"&Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebElement("html tag:=P", "class:=PageTitle").GetROProperty("innertext")
+	If Browser("brwWebCheckIn").Page("pgeWEB_Identification").WebElement("html tag:=P", "class:=PageTitle").GetROProperty("innertext") <> "" Then
+		print "here?"
+		waitload = 1
+	Else 
+		print "or here?"
+		wait 1
+		If loadwait > 30 Then
+			Reporter.ReportEvent micFail,"FM web page load","waited too long, may kill TC"
+			ExitTest
+		End If
+		loadwait = loadwait +1
+	End If
+Loop While waitload <> 1
+End Function
+
+
+Function Inv_Login_local()
+
+	If JavaWindow("wndInventory").exist(1) Then
+	   ' // This checks if Invenory has auto logged out then it closed the application
+	   If JavaWindow("wndInventory").JavaDialog("dlgReEnterPassword").JavaButton("btnExit").Exist(1) Then
+	      JavaWindow("wndInventory").JavaDialog("dlgReEnterPassword").JavaButton("btnExit").Click
+	   ElseIf JavaWindow("wndInventory").JavaDialog("dlgSignIn").Exist Then	
+	   		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaButton("btnExit").Click
+	   Else 
+	   	JavaWindow("wndInventory").JavaMenu("mnuFile").JavaMenu("mnuExit").Select
+	   End If
+	   wait 15
+	End If
+	
+	SystemUtil.Run "AlteaPlanLauncher.exe", "--conf.file=cfg/cfg.ini --workstationID=1A/C/LON/B/ASL/LCO//* --airlineCode=1A --airlineNumericID=001 --platform=NATIVE --fmConfig=TST --win.env.resetList=deactivated", environment.Value("INVLaunchloc")
+	'--conf.file=cfg/cfg.ini --airlineCode=1A --airlineNumericID=083 --platform=DUMMY --officeID=LON1A0955 --includedDeviceList= --forceHybridMode.onlyFor= --forceTrustedMode.onlyFor= --win.env.resetList=deactivated
+	Common_FetchLoginProperties "1A"
+
+	'Varibale initialisation
+	s_Connection=LCase(environment.Value("TestEnv_Connection"))
+	s_UserID=environment.Value("login_UserID")'Encrypted User ID
+	s_Password=environment.Value("login_Password")'Encrypted Password
+	s_AirlineCode=environment.Value("login_Airline")
+	s_DutyCode=environment.Value("login_DutyCode")
+	s_RemoteOffice=environment.Value("login_RemoteOffice")
+	s_lstAuthentication=environment.Value("login_lstAuthentication")
+	
+	
+	' // This checks if Invenory is open if yes then it closed the application
+	' // Launch the Inventory
+	'systemutil.Run "C:\Program Files (x86)\Altea Inventory TST\Inv_Generic.bat"
+	'Common_AppLaunch "INVENTORY"
+	
+	'// wait for Inventory login page to come up.
+	JavaWindow("wndInventory").JavaDialog("dlgSignIn").WaitProperty "text","Sign in",9000000
+	
+	If JavaWindow("wndInventory").JavaDialog("dlgSignIn").Exist(10) Then
+	   call Common_CaptureScreenshot("Inventory Launch Sucessfull",1)
+	    'Login to application
+	  	JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaList("lstConnection").Select s_Connection
+	  	JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtUserID").SetSecure s_UserID
+		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtPassword").SetSecure s_Password
+		'JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtOrganization").Set s_AirlineCode
+		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaButton("btnAdvanced").Click
+		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaList("lstAuthentication").Select s_lstAuthentication
+		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaList("lstDutyCode").Select s_DutyCode
+		'If JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtOfficeID").GetROProperty ("enabled")=True Then
+		'   JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtOfficeID").Set s_RemoteOffice
+		'End If
+		If JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtRemoteOffice").GetROProperty("enabled") = 1 Then
+		   JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaEdit("txtRemoteOffice").Set s_RemoteOffice
+		End If
+		
+
+		JavaWindow("wndInventory").JavaDialog("dlgSignIn").JavaButton("btnSignIn").Click
+		'Search for the flight and trigger the flight
+		if JavaWindow("wndInventory").JavaCheckBox("chkFlightShedule").Exist(100) then
+		   call Common_CaptureScreenshot("Inventory LoginSucessfull",1)
+		   
+	    Else
+	  		 call Common_CaptureScreenshot("Inventory login failed",0) 
+	         environment.Value("e_Inv_Login")=False  		 
+	    End if 
+	   
+	Else
+	   call Common_CaptureScreenshot("Inventory Launch failed",0)
+	   environment.Value("e_Inv_Login")=False
+	End If
+End Function
+
+
+Public Function test()
+	JavaWindow("wndAltéaDepartureControl").JavaTable("tblSupervisorShiftSummary").Click 1,1,"RIGHT"
+	wait 3
+	JavaWindow("wndAltéaDepartureControl").JavaMenu("mnuPassenger").Select
+End Function
+
+
+Public Function f_TechGUILogin()
+	SystemUtil.Run "LaunchTechnicalData.cmd","","C:\Program Files (x86)\Amadeus Applications\Altea DCS - FM Flight Technical Data",""
+
+Common_FetchLoginProperties environment("e_LoginAirLine")
+Environment("login_RemoteOffice")="BLR1A0956"
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").WaitProperty "text","Sign in",90000
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaList("lstConnection").Select "FM_"& Environment("TestEnv_Connection")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaEdit("txtUserID").Setsecure Environment("login_UserID")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaEdit("txtPassword").SetSecure Environment("login_Password")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaEdit("txtOrganization").Set environment("e_LoginAirLine")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaButton("btnAdvanced").Click
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaList("lstDutyCode").Select Environment("login_DutyCode")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaEdit("txtOfficeID").Set Environment("login_RemoteOffice")
+JavaWindow("FMTechGUI").JavaDialog("dlgSignIn").JavaButton("btnSignIn").Click
+
+
+
+
+If JavaWindow("FMTechGUI").JavaButton("btnDisplay").Exist(10) Then
+	Common_Report "Login to FM TechGUI Successful||PASS"
+	environment.Value("e_LoginStatus")=true
+Else
+    Common_Report "Login FM TechGUI Failed||FAIL"
+	environment.Value("e_LoginStatus")=False
+End If
+End Function
+
+
+
+Function f_FMLaunch_login()
+	If environment.Value("FMLaunchloc") = "" Then
+		'RunAction "FM_Login [FM_Login]", oneIteration
+		FM_Login
+	Else 
+		SystemUtil.Run "1A-Launcher.exe", "--conf.file=cfg/cfg.ini --workstationID=1A/C/LON/B/ASL/LCO//* --airlineCode=1A --airlineNumericID=001 --platform=NATIVE --fmConfig=TST --win.env.resetList=deactivated", environment.Value("FMLaunchloc")
+		'RunAction "FM_Login [FM_Login]", oneIteration
+		FM_Login
+	End If
+	wait 3
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnWelcomeOK").Click
+	
+End Function
+
+Function f_FMregistration(testdate)
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaButton("btnCustomisedSearch").Click
+	
+	wait 5
+	
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaButton("btnReset").Click
+	wait 2
+	
+	Call waitforit()
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtDepartureDate").Type testdate
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtToDateRange").Type testdate
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtCarrierCode").Type environment.Value("e_AirlineCode")
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaEdit("txtFlightNumbers").Type environment.Value("e_FlightNo")
+	JavaWindow("wndAltéaDepartureControl").JavaDialog("wndCustomisedSearch").JavaButton("btnSearch").Click
+	
+	wait 2
+	javawindow("wndAltéaDepartureControl").javatable("tblSupervisorShiftSummary").ClickCell 0,"Arr"
+	wait 2
+	javawindow("wndAltéaDepartureControl").JavaButton("btnAllocateResource").Click
+
+End Function
+

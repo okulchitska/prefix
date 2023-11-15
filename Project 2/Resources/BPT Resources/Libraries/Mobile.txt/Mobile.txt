@@ -1,0 +1,22 @@
+'********************************************************************************
+'       Mobile Functions
+'       -------------------------
+'
+'   Available Functions:
+' * ---------------------------------------
+' *
+' * - SetActiveMobileDevice - Sets the active mobile device to use for the business process (BPT) test.
+
+' * - SetActiveMobileDeviceById - Sets the active mobile device to use for the business process (BPT) test by using the device ID.
+
+' Function SetActiveMobileDevice
+' ------------------
+' Sets the active mobile device to use for the business process (BPT) test.
+' Parameter: device_ostype, device_osversion, device_model, device_manufacturer
+Function SetActiveMobileDevice(device_ostype, device_osversion, device_model, device_manufacturer)
+	mobileUtil.SetActiveMobileDevice device_ostype, device_osversion, device_model, device_manufacturer
+End Function
+
+Function SetActiveMobileDeviceById(device_id)
+	mobileUtil.SetActiveMobileDeviceById device_id
+End Function

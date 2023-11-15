@@ -1,0 +1,84 @@
+﻿'----------------------------------------------------------------------------------------------------------------------------------------------------
+'	# Public Function Recovery_CleanUpFunction(Object, Method, Arguments, retVal)
+'
+' 		~ This is a recovery function.On any error it will capture and upload logs and kill the application.
+'		~ Usage	 : CleanUpFunction(Object, Method, Arguments, retVal)
+' 		~ Input  : Called by UFT, no input required
+'		~ Output : none
+'
+'	@author		:   Ravi kumar and Rupawathi
+'	@copyright	:  	2017 Amadeus Services Limited. All rights reserved.
+'	@contact	:   Ravi.kumar@amadeus.com,Rupawathi.BOKKA@amadeus.com
+'	@deffield	:   Created:22/03/2018  | Last Updated: 
+'----------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 
+Function Recovery_CleanUpFunction(Object, Method, Arguments, retVal)
+	Dim e_popVal,e_SciptVal
+	e_popVal=Environment.Value("Pop_upHandler")
+	e_SciptVal=Environment.Value("RSEnabled")
+	'The flag is added if it's not handled in code
+	
+	Common_Report "Begining RS| Recovery scenerio |WARNING "
+	Common_Report "Global_RS value|"& Environment("Global_RS") &" |WARNING "
+	Common_Report "Pop_upHandler value|"& Environment("Pop_upHandler") &" |WARNING "
+	Common_Report "RSEnabled value|"& Environment("RSEnabled") &" |WARNING "
+	
+   	If Environment("Global_RS") = true then                  
+		If (e_SciptVal=1) or (e_SciptVal=true) then
+			if (e_popVal=1) or (e_popVal=true) then 
+				Common_CMJFELogAttachToRun()
+				'Common_KillGUIApp "1A-Launcher.exe"
+				
+				Common_Report "Caught Error| Recovery scenerio |FAIL "
+				ExitTest
+			Else
+				Environment.Value("Pop_upHandler")=1
+				Exit function	
+			End if
+		Else
+		'changes done by Rupa
+			'Exit function
+			'Common_KillGUIApp "1A-Launcher.exe"
+			Common_Report "Caught Error| Recovery scenerio |FAIL "
+			ExitTest
+		End if
+	else
+		Common_Report "Caught Error| Recovery scenerio |FAIL "
+
+	End If
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------------------------------------
+'	# Public Function Recovery_PopUp_Handler(Object)
+'
+' 		~ This is a recovery function.This get into action automatically when messanger pop-up appear
+'		~ Usage	 : Recovery_PopUp_Handler(Object)
+' 		~ Input  : Called by UFT, no input required
+'		~ Output : none
+'
+'	@author		:   Ravi kumar and Rupawathi
+'	@copyright	:  	2017 Amadeus Services Limited. All rights reserved.
+'	@contact	:   Ravi.kumar@amadeus.com,Rupawathi.BOKKA@amadeus.com
+'	@deffield	:   Created:22/03/2018  | Last Updated: 
+'----------------------------------------------------------------------------------------------------------------------------------------------------
+Function Recovery_PopUp_Handler(Object)
+    
+    If JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnCancel").Exist() Then
+    	JavaWindow("wndCM").JavaDialog("wndWarning").JavaButton("btnCancel").Click
+    	Common_Report "Messanger Pop up Appeared!||Warning"
+    End If
+    
+    err.clear
+	Environment.Value("Pop_upHandler")=0
+
+End Function 
+ 
+ 
+ Function Recovery_JFELaunchRetry(Object)
+    Common_KillGUIApp "1A-Launcher.exe"
+	Common_JFEAutoDownload
+
+End Function 
+ 
+ 

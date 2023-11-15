@@ -1,0 +1,220 @@
+<ConnectorCFG version="1.00">
+  <CFG>
+    <Options>
+	<UniqueWAPRecord  level="forbidden"></UniqueWAPRecord> 
+    </Options>
+
+    <FormField id="Project" WAP-List="S8996">
+      <WAP-Target>S8996</WAP-Target>
+    </FormField>
+
+    <FormField id="Product"  WAP-List="S8997"  >
+      <WAP-Target>S8997</WAP-Target>
+    </FormField>
+  
+    <FormField id="Description" AddLoggerInfo="False">
+      <ALM-DefectField>Description</ALM-DefectField>
+      <default>
+      <DefectField>Description</DefectField>
+      </default>
+      <OnSave>
+        <default>
+        </default>
+      </OnSave>
+    </FormField>
+  
+    <FormField id="System" >
+      <FormField id="ActiveSystemCategory">
+        <ALM-DefectField>WAPActiveSystemCategory</ALM-DefectField>
+        <default>
+        </default>
+      </FormField>
+      <FormField id="ActiveSystem" >
+        <ALM-DefectField>WAPActiveSystem</ALM-DefectField>
+        <default>
+        </default>
+      </FormField>
+      <FormField id="ActiveSystemSubsystem" >
+        <ALM-DefectField>WAPActiveSystemSubsystem</ALM-DefectField>
+        <default>
+        </default>
+      </FormField>
+    </FormField>
+  
+      <FormField id="Severity" Custom-List="Serious;Medium;Minor">
+      <ALM-DefectField>WAPSeverity</ALM-DefectField>
+      <default>
+        <ConstantString>Minor</ConstantString>
+      </default>
+    </FormField>
+
+    <FormField id="Urgency">
+      <ALM-DefectField>WAPUrgency</ALM-DefectField>
+      <default>
+        <ConstantString>Low</ConstantString>
+      </default>
+    </FormField>
+  
+    <FormField id="WAPRecordID" >
+      <ALM-DefectField>PTR id</ALM-DefectField>
+      <WAP-Target>S0000</WAP-Target>
+    </FormField>
+  
+    <FormField id="Title" >
+      <ALM-DefectField>Summary</ALM-DefectField>      
+      <default>
+      <DefectField>Summary</DefectField>      
+      </default>
+    </FormField>
+
+    <FormField id="WAPStatus" >
+      <ALM-DefectField>WAPStatus</ALM-DefectField>
+      <WAP-Target>S0BEE</WAP-Target>
+    </FormField>
+
+      <FormField id="RefCR1"  >
+        <default>
+        </default>
+      </FormField>
+
+      <FormField id="RefCR2"  >
+        <default>
+        </default>
+      </FormField>
+	
+    <FormField id="Type" >
+      <FormField id="Type">
+        <default>
+        </default>
+      </FormField>
+      <FormField id="Component" >
+        <default>
+        </default>
+      </FormField>
+      <FormField id="SubComponent" >
+      </FormField>
+    </FormField>
+
+    <FormField id="Logger"  >
+      <FormField id="LoggerGroup" >
+      </FormField>
+    </FormField>	
+	
+    <FormField id="WAPAssignTo" >
+      <FormField id="WAPAssignToUser" >
+        <default>
+        </default>
+      </FormField>
+      <FormField id="WAPAssignToGroup" >
+      </FormField>
+    </FormField>
+	
+	
+   <FormField id="LoggerGroup" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPLoggerGroup</ALM-DefectField>
+      <WAP-Target>S0B9E</WAP-Target>
+    </FormField>
+	
+    <FormField id="LoggerName" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPLoggerName</ALM-DefectField>
+      <WAP-Target>S0B5C</WAP-Target>
+    </FormField>
+	
+	 <FormField id="AssigneeGroup" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPAssigneeGroup</ALM-DefectField>
+      <WAP-Target>S0B9C</WAP-Target>
+    </FormField>
+	
+    <FormField id="AssigneeName" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPAssigneeName</ALM-DefectField>
+      <WAP-Target>S0B5A</WAP-Target>
+    </FormField>
+	
+	
+    <FormField id="ModificationDate" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPLastUpdate</ALM-DefectField>
+		<WAP-Target>S0C35</WAP-Target>
+    </FormField>
+	
+    <FormField id="TargetDate" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPTargetDate</ALM-DefectField>
+		<WAP-Target>S82FB</WAP-Target>
+    </FormField>
+	
+    <FormField id="CreationDate" > 	<!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPCreationDate</ALM-DefectField>
+		<WAP-Target>S0C3D</WAP-Target>
+    </FormField>
+	
+   <FormField id="Keyword" >  <!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPKeywords</ALM-DefectField>
+      <WAP-Target>S8243</WAP-Target>
+      <default>
+      </default>
+    </FormField>	
+	
+    <FormField id="ADDProject" >              <!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPADDProject</ALM-DefectField>
+     <WAP-Target>S8996</WAP-Target>
+    </FormField>
+    <FormField id="ADDProduct" >             <!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPADDProduct</ALM-DefectField>
+     <WAP-Target>S8997</WAP-Target>
+    </FormField>
+    <FormField id="VendorCategory" >             <!--Please do not move this line. Needed for reporting!-->
+      <ALM-DefectField>WAPVendorReference</ALM-DefectField>
+     <WAP-Target>S0D11</WAP-Target>
+    </FormField>
+
+	
+  </CFG>
+  <Form width="700">
+    <Row>
+      <space />
+    	</Row>
+    <Row>
+      <FormField id="Title" LabelText="Title: " RequiredMessage="Please give a short description of the Problem"></FormField>
+    </Row>
+
+    <Row>
+      <FormField id="Product" LabelText="Product: "></FormField>
+      <FormField id="Project" LabelText="Project: "></FormField>
+    </Row>
+    <Row>
+      <FormField id="RefCR1" LabelText="RefCR1"></FormField>
+      <Space></Space>
+      <FormField id="RefCR2"  LabelText="RefCR2"></FormField>
+      <space />
+    </Row>
+    <Row>
+      <Group LabelText="Win@Proach Type">
+        <FormField id="Type"></FormField>
+      </Group>
+    </Row>
+    <Row>
+      <Group LabelText="Win@Proach System">
+        <FormField id="System"></FormField>
+      </Group>
+    </Row>
+    <Row>
+      <FormField id="Severity" LabelText="Severity: "></FormField>
+      <FormField id="Urgency" LabelText="Urgency: "></FormField>
+    </Row>
+    <Row>
+      <FormField id="Description"  LabelText="Description: "></FormField>
+    </Row>
+    <Row>
+      <FormField id="Keyword" LabelText="Keywords: "></FormField>
+    </Row>
+    <Row>
+      <Group LabelText="Win@Proach Logger">
+        <FormField id="Logger"></FormField>
+      </Group>
+    </Row>
+    <Row>
+      <Group LabelText="Win@Proach Assing to">
+        <FormField id="WAPAssignTo"></FormField>
+      </Group>
+    </Row>
+  </Form>
+</ConnectorCFG>
